@@ -12,7 +12,7 @@ EXTERN=Web-SDK/src/extern.js
 
 all: dist/build.min.js dist/build.js README.md
 clean:
-	rm -f dist/** docs/3_branch_web.md README.md test/branch-deps.js dist/web/build.min.js.gz test/integration-test.html
+	rm -f dist/** docs/3_branch_web.md README.md
 
 # Kinda gross, but will download closure compiler if you don't have it.
 compiler/compiler.jar:
@@ -44,4 +44,4 @@ docs/titanium/3_branch_titanium.md: $(SOURCES)
 README.md: docs/0_notice.md docs/titanium/1_intro.md docs/titanium/3_branch_titanium.md docs/4_footer.md
 	perl Web-SDK/build_utils/toc_generator.pl Web-SDK/src/3_branch.js docs/titanium/2_table_of_contents.md TITANIUM
 	cat docs/0_notice.md docs/titanium/1_intro.md docs/titanium/2_table_of_contents.md docs/titanium/3_branch_titanium.md docs/4_footer.md > README.md
-	perl -p -i -e 's/# Global//' TITANIUM_GUIDE.md
+	perl -p -i -e 's/# Global//' README.md
