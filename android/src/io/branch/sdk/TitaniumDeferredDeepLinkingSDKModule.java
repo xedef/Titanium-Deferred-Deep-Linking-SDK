@@ -8,12 +8,20 @@
  */
 package io.branch.sdk;
 
+import android.app.Activity;
+
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.kroll.common.TiConfig;
+import org.appcelerator.kroll.KrollDict;
+
+import org.json.JSONObject;
+
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
 
 
 @Kroll.module(name="TitaniumDeferredDeepLinkingSDK", id="io.branch.sdk")
@@ -39,27 +47,104 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 		// put module init code that needs to run when the application is created
 	}
 
-	// Methods
+	//----------- Methods ----------//
 	@Kroll.method
-	public String example()
+	public void initSession()
 	{
-		Log.d(LCAT, "example called");
-		return "hello world";
+		Log.d(LCAT, "start init");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		instance.initSession(new SessionListener(), activity.getIntent().getData(), activity);
 	}
 
-	// Properties
-	@Kroll.getProperty
-	public String getExampleProp()
+	@Kroll.method
+	public KrollDict getLatestReferringParams()
 	{
-		Log.d(LCAT, "get example property");
-		return "hello world";
+		Log.d(LCAT, "start getLatestReferringParams");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		JSONObject sessionParams = instance.getLatestReferringParams();
+		if (sessionParams == null) {
+    		Log.d(LCAT, "return is null");
+    		return null;
+    	} else {
+    		Log.d(LCAT, "return is not null");
+    		Log.d(LCAT, sessionParams.toString());
+    	}
+
+    	KrollDict sessionDict = new KrollDict();
+    	sessionDict.put("is_first_session", sessionParams.optBoolean("+is_first_session"));
+        sessionDict.put("clicked_branch_link", sessionParams.optBoolean("+clicked_branch_link"));
+    	return sessionDict;
 	}
 
+	@Kroll.method
+	public KrollDict getFirstReferringParams()
+	{
+		Log.d(LCAT, "start getFirstReferringParams");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
 
-	@Kroll.setProperty
-	public void setExampleProp(String value) {
-		Log.d(LCAT, "set example property: " + value);
+		JSONObject installParams = instance.getFirstReferringParams();
+		if (installParams == null) {
+    		Log.d(LCAT, "return is null");
+    		return null;
+    	} else {
+    		Log.d(LCAT, "return is not null");
+    		Log.d(LCAT, installParams.toString());
+    	}
+
+    	KrollDict installDict = new KrollDict();
+    	installDict.put("is_first_session", installParams.optBoolean("+is_first_session"));
+        installDict.put("clicked_branch_link", installParams.optBoolean("+clicked_branch_link"));
+    	return installDict;
 	}
+
+	@Kroll.method
+	public void setIdentity(String identity)
+	{
+		Log.d(LCAT, "start setIdentity");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		instance.setIdentity(identity);
+	}
+
+	@Kroll.method
+	public void logout()
+	{
+		Log.d(LCAT, "start logout");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		instance.logout();
+	}
+
+	//----------- Inner Classes: Listeners ----------//
+    protected class SessionListener implements Branch.BranchReferralInitListener
+    {
+    	// Listener that implements BranchReferralInitListener for initSession
+        @Override
+        public void onInitFinished(JSONObject referringParams, BranchError error) {
+        	Log.d(LCAT, "inside onInitFinished");
+        	TitaniumDeferredDeepLinkingSDKModule self = TitaniumDeferredDeepLinkingSDKModule.this;
+        	if (referringParams == null) {
+        		Log.d(LCAT, "return is null");
+        		return;
+        	} else {
+        		Log.d(LCAT, "return is not null");
+        		Log.d(LCAT, String.valueOf(referringParams.optBoolean("+is_first_session")));
+        		Log.d(LCAT, String.valueOf(referringParams.optBoolean("+clicked_branch_link")));
+        	}
+
+        	KrollDict branchDict = new KrollDict();
+        	branchDict.put("is_first_session", referringParams.optBoolean("+is_first_session"));
+        	branchDict.put("clicked_branch_link", referringParams.optBoolean("+clicked_branch_link"));
+        	self.fireEvent("bio:initSession", branchDict);
+        }
+    }
 
 }
 
