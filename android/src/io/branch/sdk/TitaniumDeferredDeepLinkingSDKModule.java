@@ -48,6 +48,7 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	}
 
 	//----------- Methods ----------//
+	// Public Methods
 	@Kroll.method
 	public void initSession()
 	{
@@ -74,10 +75,7 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
     		Log.d(LCAT, sessionParams.toString());
     	}
 
-    	KrollDict sessionDict = new KrollDict();
-    	sessionDict.put("is_first_session", sessionParams.optBoolean("+is_first_session"));
-        sessionDict.put("clicked_branch_link", sessionParams.optBoolean("+clicked_branch_link"));
-    	return sessionDict;
+    	return createSessionDict(sessionParams);
 	}
 
 	@Kroll.method
@@ -96,10 +94,7 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
     		Log.d(LCAT, installParams.toString());
     	}
 
-    	KrollDict installDict = new KrollDict();
-    	installDict.put("is_first_session", installParams.optBoolean("+is_first_session"));
-        installDict.put("clicked_branch_link", installParams.optBoolean("+clicked_branch_link"));
-    	return installDict;
+    	return createSessionDict(installParams);
 	}
 
 	@Kroll.method
@@ -113,6 +108,26 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	}
 
 	@Kroll.method
+	public void userCompletedAction(String action)
+	{
+		Log.d(LCAT, "start userCompletedAction");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		instance.userCompletedAction(action);
+	}
+
+	@Kroll.method
+	public void userCompletedActionWithAppstate(String action, JSONObject appState)
+	{
+		Log.d(LCAT, "start userCompletedAction with appState");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		instance.userCompletedAction(action, appState);
+	}
+
+	@Kroll.method
 	public void logout()
 	{
 		Log.d(LCAT, "start logout");
@@ -122,6 +137,48 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 		instance.logout();
 	}
 
+	// Private Methods
+	private KrollDict createSessionDict(JSONObject data) {
+		KrollDict sessionDict = new KrollDict();
+		if (data.has("~channel")) {
+			sessionDict.put("~channel", data.optString("~channel"));
+		}
+    	if (data.has("~feature")) {
+			sessionDict.put("~feature", data.optString("~feature"));
+		}
+		if (data.has("~tags")) {
+			sessionDict.put("~tags", data.optString("~tags"));
+		}
+		if (data.has("~campaign")) {
+			sessionDict.put("~campaign", data.optString("~campaign"));
+		}
+		if (data.has("~stage")) {
+			sessionDict.put("~stage", data.optString("~stage"));
+		}
+		if (data.has("~creation_source")) {
+			sessionDict.put("~creation_source", data.optString("~creation_source"));
+		}
+		if (data.has("+match_guaranteed")) {
+			sessionDict.put("+match_guaranteed", data.optBoolean("+match_guaranteed"));
+		}
+		if (data.has("+referrer")) {
+			sessionDict.put("+referrer", data.optString("+referrer"));
+		}
+		if (data.has("+phone_number")) {
+			sessionDict.put("+phone_number", data.optString("+phone_number"));
+		}
+		if (data.has("+is_first_session")) {
+			sessionDict.put("+is_first_session", data.optBoolean("+is_first_session"));
+		}
+		if (data.has("+clicked_branch_link")) {
+			sessionDict.put("+clicked_branch_link", data.optBoolean("+clicked_branch_link"));
+		}
+		if (data.has("+click_timestamp")) {
+			sessionDict.put("+click_timestamp", data.optBoolean("+click_timestamp"));
+		}
+    	return sessionDict;
+	}
+
 	//----------- Inner Classes: Listeners ----------//
     protected class SessionListener implements Branch.BranchReferralInitListener
     {
@@ -129,20 +186,22 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
         @Override
         public void onInitFinished(JSONObject referringParams, BranchError error) {
         	Log.d(LCAT, "inside onInitFinished");
-        	TitaniumDeferredDeepLinkingSDKModule self = TitaniumDeferredDeepLinkingSDKModule.this;
-        	if (referringParams == null) {
-        		Log.d(LCAT, "return is null");
-        		return;
-        	} else {
-        		Log.d(LCAT, "return is not null");
-        		Log.d(LCAT, String.valueOf(referringParams.optBoolean("+is_first_session")));
-        		Log.d(LCAT, String.valueOf(referringParams.optBoolean("+clicked_branch_link")));
-        	}
+        	if (error == null) {
+	            // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
+	            // params will be empty if no data found
+	            TitaniumDeferredDeepLinkingSDKModule self = TitaniumDeferredDeepLinkingSDKModule.this;
+	        	if (referringParams == null) {
+	        		Log.d(LCAT, "return is null");
+	        		return;
+	        	} else {
+	        		Log.d(LCAT, "return is not null");
+	        		Log.d(LCAT, referringParams.toString());
+	        	}
 
-        	KrollDict branchDict = new KrollDict();
-        	branchDict.put("is_first_session", referringParams.optBoolean("+is_first_session"));
-        	branchDict.put("clicked_branch_link", referringParams.optBoolean("+clicked_branch_link"));
-        	self.fireEvent("bio:initSession", branchDict);
+	        	self.fireEvent("bio:initSession", createSessionDict(referringParams));
+	        } else {
+	            Log.d(LCAT, error.getMessage());
+	        }
         }
     }
 
