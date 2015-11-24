@@ -117,9 +117,11 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 		// You use this to specify whether this content can be discovered publicly - default is public
 		if (options.containsKey("contentIndexingMode")) {
 			Log.d(LCAT, "setContentIndexingMode");
-			if (options.getString("contentIndexingMode") == "private") {
+			if (options.getString("contentIndexingMode").equals("private")) {
+				Log.d(LCAT, "private");
 				branchUniversalObject.setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
 			} else {
+				Log.d(LCAT, "public");
 				branchUniversalObject.setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
 			}
 		}
@@ -150,15 +152,28 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 	{
 		Log.d(LCAT, "start generateShortUrl");
 		LinkProperties linkProperties = new LinkProperties();
-		linkProperties.setFeature(options.getString("feature"));
-		linkProperties.setAlias(options.getString("alias"));
-		linkProperties.setChannel(options.getString("channel"));
-		linkProperties.setStage(options.getString("stage"));
-		linkProperties.setDuration(options.getInt("duration"));
 
-		ArrayList<String> tags = (ArrayList<String>) options.get("tags");
-		for (String tag : tags) {
-			 linkProperties.addTag(tag);
+		if (options.containsKey("feature")) {
+			linkProperties.setFeature(options.getString("feature"));
+		}
+		if (options.containsKey("alias")) {
+			linkProperties.setAlias(options.getString("alias"));
+		}
+		if (options.containsKey("channel")) {
+			linkProperties.setChannel(options.getString("channel"));
+		}
+		if (options.containsKey("stage")) {
+			linkProperties.setStage(options.getString("stage"));
+		}
+		if (options.containsKey("duration")) {
+			linkProperties.setDuration(options.getInt("duration"));
+		}
+
+		if (options.containsKey("tags")) {
+			ArrayList<String> tags = (ArrayList<String>) options.get("tags");
+			for (String tag : tags) {
+				 linkProperties.addTag(tag);
+			}
 		}
 
 		if (controlParams.containsKey("$fallback_url")) {
@@ -266,7 +281,7 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 	public void setContentIndexingMode(String contentIndexingMode)
 	{
 	    Log.d(LCAT, "setContentIndexingMode");
-	    if (contentIndexingMode == "private") {
+	    if (contentIndexingMode.equals("private")) {
 			branchUniversalObject.setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
 		} else {
 			branchUniversalObject.setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
@@ -287,7 +302,9 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 	    public void onLinkCreate(String url, BranchError error) {
 	    	Log.d(LCAT, "inside onLinkCreate");
 	        if (error == null) {
+	        	BranchUniversalObjectProxy self = BranchUniversalObjectProxy.this;
 	            Log.d(LCAT, "link to share: " + url);
+	            self.fireEvent("bio:generateShortUrl", url);
 	        } else {
 	        	Log.d(LCAT, error.getMessage());
 	        }

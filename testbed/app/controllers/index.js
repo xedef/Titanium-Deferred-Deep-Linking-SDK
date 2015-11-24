@@ -28,7 +28,7 @@ branch.addEventListener("bio:initSession", function(data) {
         "canonicalIdentifier" : "identifier",
         "title" : "title",
         "contentDescription" : "contentDescription",
-        "setContentImageUrl" : "http://setContentImageUrl",
+        "contentImageUrl" : "http://contentImageUrl",
         "contentIndexingMode" : "private",
         "contentMetadata" : {
             "key" : "value",
@@ -39,8 +39,25 @@ branch.addEventListener("bio:initSession", function(data) {
     Ti.API.debug("canonical " + proxy.getCanonicalIdentifier());
     Ti.API.debug("title " + proxy.getTitle());
     Ti.API.debug("description " + proxy.getContentDescription());
-    Ti.API.debug("imageUrl " + proxy.getContentImageUrl());
+    Ti.API.debug("contentImageUrl " + proxy.getContentImageUrl());
     Ti.API.debug("isPublicallyIndexable " + proxy.isPublicallyIndexable());
+
+    proxy.generateShortUrl({
+        "feature" : "feature",
+        "alias" : "alias",
+        "channel" : "channel",
+        "stage" : "stage",
+        "duration" : 1,
+    }, {
+        "$fallback_url" : "http://$fallback_url",
+        "$desktop_url" : "http://$desktop_url",
+        "$android_url" : "http://$android_url",
+        "$ios_url" : "http://$ios_url",
+        "$ipad_url" : "http://$ipad_url",
+        "$fire_url" : "http://$fire_url",
+        "$blackberry_url" : "http://$blackberry_url",
+        "$windows_phone_url" : "http://$windows_phone_url",
+    });
 
     // logout
     branch.logout();
