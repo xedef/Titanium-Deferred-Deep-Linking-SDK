@@ -36,6 +36,9 @@
         <false/>
         <key>UIStatusBarStyle</key>
         <string>UIStatusBarStyleDefault</string>
+        <!-- Add branch key as key-value pair -->
+        <key>branch_key</key>
+        <string>key_live_fnmRM1FXtu11t6e4LU8WsldpvDcA0bzv</string>
       </dict>
     </plist>
   </ios>
@@ -76,6 +79,7 @@
   <modules>
     <module platform="commonjs">ti.cloud</module>
     <module platform="android">io.branch.sdk</module>
+    <module platform="iphone">io.branch.sdk</module>
   </modules>
   <deployment-targets>
     <target device="android">true</target>

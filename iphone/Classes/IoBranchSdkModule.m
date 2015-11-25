@@ -113,19 +113,17 @@
 
 #pragma mark - InitSession Permutation methods
 
-- (void)initSession
+- (void)initSession:(id)args
 {
     Branch *branch = [self getInstance];
     [branch initSession];
     NSLog(@"session initialized");
 }
 
-- (void)initSession:(id)args
+- (void)initSessionIsReferrable:(id)args
 {
-    ENSURE_SINGLE_ARG(args, NSDictionary);
-    
+    ENSURE_ARG_COUNT(args, 1);
     id arg = [args objectAtIndex:0];
-    ENSURE_TYPE([arg objectForKey:@"isReferrable"], NSNumber);
     
     Branch *branch = [self getInstance];
     BOOL isReferrable = [TiUtils boolValue:arg];
@@ -146,29 +144,74 @@
 
 - (void)initSessionWithLaunchOptionsAndAutomaticallyDisplayDeepLinkController:(id)args
 {
-    ENSURE_SINGLE_ARG(args, NSDictionary);
+    ENSURE_ARG_COUNT(args, 1);
     
     Branch *branch = [self getInstance];
     NSDictionary *launchOptions = [[TiApp app] launchOptions];
+    BOOL display = YES;
     
-    id arg = [args objectAtIndex:0];
-    ENSURE_TYPE([arg objectForKey:@"display"], NSNumber);
-    BOOL display = [TiUtils boolValue:@"display" properties:arg def:YES];
-    
-    KrollCallback *deepLinkHandler = [arg objectForKey:@"deepLinkHandler"];
+    KrollCallback *deepLinkHandler = [args objectAtIndex:0];
     ENSURE_TYPE(deepLinkHandler, KrollCallback);
     
     [branch initSessionWithLaunchOptions:launchOptions automaticallyDisplayDeepLinkController:display deepLinkHandler:^(NSDictionary *params, NSError *error) {
         if (!error) {
-            NSLog(@"finished init with params = %@", [params description]);
-            [deepLinkHandler call:@[params, error] thisObject:nil];
+            [deepLinkHandler call:@[params, NUMBOOL(YES)] thisObject:nil];
         }
         else {
-            NSLog(@"failed init: %@", error);
-            [deepLinkHandler call:@[params, error] thisObject:nil];
+            [deepLinkHandler call:@[params, NUMBOOL(NO)] thisObject:nil];
         }
     }];
 }
+
+
+#pragma mark - retrieve session/install params
+- (NSDictionary *)getLatestReferringParams:(id)args
+{
+    Branch *branch = [self getInstance];
+    NSDictionary *sessionParams = [branch getLatestReferringParams];
+    
+    return sessionParams;
+}
+
+- (NSDictionary *)getFirstReferringParams:(id)args
+{
+    Branch *branch = [self getInstance];
+    NSDictionary *installParams = [branch getFirstReferringParams];
+    
+    return installParams;
+}
+
+
+#pragma mark - set identity
+
+- (void)setIdentity:(id)args
+{
+    NSString *userId = (NSString *)[args objectAtIndex:0];
+    KrollCallback *callback = nil;
+    
+    if ([args count]==2) {
+        callback = [args objectAtIndex:1];
+    }
+    
+    Branch *branch = [self getInstance];
+    
+    if (!callback) {
+        [branch setIdentity:userId];
+    }
+    else {
+        [branch setIdentity:userId withCallback:^(NSDictionary *params, NSError *error) {
+            if (!error) {
+                [callback call:@[params, NUMBOOL(YES)] thisObject:nil];
+            }
+            else {
+                [callback call:@[params, NUMBOOL(NO)] thisObject:nil];
+            }
+        }];
+    }
+}
+
+
+#pragma mark - handle deep link
 
 - (id)handleDeepLink:(id)args
 {
