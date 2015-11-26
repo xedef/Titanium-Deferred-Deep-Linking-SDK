@@ -88,15 +88,13 @@
     return [Branch getInstance];
 }
 
-- (Branch *)getInstance:(id)args
+- (Branch *)getInstance:(NSString *)branchKey
 {
-    ENSURE_SINGLE_ARG(args, NSString);
-    NSString *branchKey = (NSString *)[args objectAtIndex:0];
     if (branchKey) {
         return [Branch getInstance:branchKey];
     }
     else {
-        return [self getInstance];
+        return [Branch getInstance];
     }
 }
 
@@ -116,17 +114,18 @@
 - (void)initSession:(id)args
 {
     Branch *branch = [self getInstance];
-    [branch initSession];
+    NSDictionary *launchOptions = [[TiApp app] launchOptions];
+    
+    [branch initSessionWithLaunchOptions:launchOptions];
     NSLog(@"session initialized");
 }
 
 - (void)initSessionIsReferrable:(id)args
 {
-    ENSURE_ARG_COUNT(args, 1);
-    id arg = [args objectAtIndex:0];
+    ENSURE_SINGLE_ARG(args, NSNumber);
     
     Branch *branch = [self getInstance];
-    BOOL isReferrable = [TiUtils boolValue:arg];
+    BOOL isReferrable = [TiUtils boolValue:args];
     
     [branch initSession:isReferrable];
 }
@@ -138,20 +137,19 @@
     Branch *branch = [self getInstance];
     id arg = [args objectAtIndex:0];
     BOOL automaticallyDisplayController = [TiUtils boolValue:arg];
-                      
+    
     [branch initSessionAndAutomaticallyDisplayDeepLinkController:automaticallyDisplayController];
 }
 
 - (void)initSessionWithLaunchOptionsAndAutomaticallyDisplayDeepLinkController:(id)args
 {
-    ENSURE_ARG_COUNT(args, 1);
+    ENSURE_SINGLE_ARG(args, KrollCallback);
     
     Branch *branch = [self getInstance];
     NSDictionary *launchOptions = [[TiApp app] launchOptions];
     BOOL display = YES;
     
-    KrollCallback *deepLinkHandler = [args objectAtIndex:0];
-    ENSURE_TYPE(deepLinkHandler, KrollCallback);
+    KrollCallback *deepLinkHandler = args;
     
     [branch initSessionWithLaunchOptions:launchOptions automaticallyDisplayDeepLinkController:display deepLinkHandler:^(NSDictionary *params, NSError *error) {
         if (!error) {
@@ -167,6 +165,8 @@
 #pragma mark - retrieve session/install params
 - (NSDictionary *)getLatestReferringParams:(id)args
 {
+    ENSURE_ARG_COUNT(args, 0);
+    
     Branch *branch = [self getInstance];
     NSDictionary *sessionParams = [branch getLatestReferringParams];
     
@@ -175,6 +175,8 @@
 
 - (NSDictionary *)getFirstReferringParams:(id)args
 {
+    ENSURE_ARG_COUNT(args, 0);
+    
     Branch *branch = [self getInstance];
     NSDictionary *installParams = [branch getFirstReferringParams];
     
@@ -186,14 +188,22 @@
 
 - (void)setIdentity:(id)args
 {
-    NSString *userId = (NSString *)[args objectAtIndex:0];
+    Branch *branch = [self getInstance];
+    NSString *userId = nil;
     KrollCallback *callback = nil;
     
+    // if a callback is passed as an argument
     if ([args count]==2) {
+        ENSURE_TYPE([args objectAtIndex:0], NSString);
+        userId = [args objectAtIndex:0];
+        
+        ENSURE_TYPE([args objectAtIndex:1], KrollCallback);
         callback = [args objectAtIndex:1];
     }
-    
-    Branch *branch = [self getInstance];
+    else {
+        ENSURE_SINGLE_ARG(args, NSString);
+        userId = (NSString *)args;
+    }
     
     if (!callback) {
         [branch setIdentity:userId];

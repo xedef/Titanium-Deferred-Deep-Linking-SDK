@@ -108,31 +108,55 @@ else if (OS_IOS) {
     var branch = require('io.branch.sdk');
 
     // Initialize a session
-    branch.initSession();
-    
-    // Retrieve session params
-    var sessionParams = branch.getLatestReferringParams();
-    Ti.API.debug("session parameters:");
-    Ti.API.debug(sessionParams);
+    //branch.initSession();
+    branch.initSessionWithLaunchOptionsAndAutomaticallyDisplayDeepLinkController(
+        function(params, success) {
+            if (success) {
+                Ti.API.debug('init success');
 
-    // Retrieve install params
-    var installParams = branch.getFirstReferringParams();
-    Ti.API.debug("install parameters:");
-    Ti.API.debug(installParams);
+                // Retrieve session params
+                var sessionParams = branch.getLatestReferringParams();
+                Ti.API.debug("session parameters:");
+                Ti.API.debug(sessionParams);
 
-    // Persistent identities
-    branch.setIdentity('my_user_id', function(params, success){
-        if (success) {
-            Ti.API.debug('setIdentity was successful');
-        }
-        else {
-            Ti.API.debug('setIdentity failed!');
-        }
-        Ti.API.debug(params);
-    });
-    // Logout
-    branch.logout();
-    Ti.API.debug('session was logged out');
+                // Retrieve install params
+                var installParams = branch.getFirstReferringParams();
+                Ti.API.debug("install parameters:");
+                Ti.API.debug(installParams);
+
+                // Persistent identities
+                branch.setIdentity('my_user_id', function(params, success){
+                    if (success) {
+                        Ti.API.debug('setIdentity was successful');
+                    }
+                    else {
+                        Ti.API.debug('setIdentity failed!');
+                    }
+
+                    // Branch Universal Object
+                    var branchUniversal = branch.createBranchUniversal();
+                    var universalObj = branchUniversal.initWithCanonicalIdentifier('item/12345');
+
+                    universalObj.title = 'My Content Title';
+                    universalObj.contentDescription = 'My Content Description';
+                    universal.Obj.imageUrl = 'https://example.com/mycontent-12345.png';
+
+                    Ti.API.debug('Branch Universal properties:');
+                    Ti.API.debug(universalObj.canonicalIdentifier);
+                    Ti.API.debug(universalObj.title);
+                    Ti.API.debug(universalObj.contentDescription);
+                    Ti.API.debug(universalObj.imageUrl);
+
+                    // Logout
+                    branch.logout();
+                    Ti.API.debug('session was logged out');
+                });
+            }
+            else {
+                Ti.API.debug('init failed');
+            }
+            Ti.API.debug('init completed');
+        });
 }
 
 function doClick(e) {
