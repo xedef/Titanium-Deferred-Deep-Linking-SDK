@@ -9,6 +9,7 @@
 package io.branch.sdk;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollProxy;
@@ -17,6 +18,7 @@ import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.util.Log;
 import org.appcelerator.titanium.util.TiConfig;
 import org.appcelerator.titanium.util.TiConvert;
+import org.appcelerator.titanium.util.TiRHelper;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiCompositeLayout;
 import org.appcelerator.titanium.view.TiCompositeLayout.LayoutArrangement;
@@ -34,6 +36,8 @@ import io.branch.referral.BranchError;
 import io.branch.referral.BranchShortLinkBuilder;
 import io.branch.referral.Defines;
 import io.branch.referral.util.LinkProperties;
+
+import io.branch.referral.SharingHelper;
 import io.branch.referral.util.ShareSheetStyle;
 
 
@@ -213,6 +217,23 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 		branchUniversalObject.generateShortUrl(activity, linkProperties, new GenerateShortUrlListener());
 	}
 
+	@Kroll.method
+	public void showShareSheet(KrollDict options, KrollDict controlParams)
+	{
+		Log.d(LCAT, "start showShareSheet");
+		final Activity activity = this.getActivity();
+
+		ShareSheetStyle shareSheetStyle = new ShareSheetStyle(activity, "Check this out!", "This stuff is awesome: ")
+                .setCopyUrlStyle(activity.getResources().getDrawable(android.R.drawable.ic_menu_send), "Copy", "Added to clipboard")
+                .setMoreOptionStyle(activity.getResources().getDrawable(android.R.drawable.ic_menu_search), "Show more")
+                .addPreferredSharingOption(SharingHelper.SHARE_WITH.FACEBOOK)
+                .addPreferredSharingOption(SharingHelper.SHARE_WITH.EMAIL);
+
+        LinkProperties linkProperties = createLinkPropertiesDict(options, controlParams);
+
+		branchUniversalObject.showShareSheet(activity, linkProperties, shareSheetStyle, new ShowShareSheetListener());
+	}
+
 	//-----------  Property Getter/Setter ----------//
 	@Kroll.getProperty @Kroll.method
 	public String getCanonicalIdentifier()
@@ -295,19 +316,127 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 		branchUniversalObject.addContentMetadata(key, value);
 	}
 
+	//----------- Private Methods ----------//
+	private LinkProperties createLinkPropertiesDict(KrollDict options, KrollDict controlParams)
+	{
+		Log.d(LCAT, "start createLinkPropertiesDict");
+		LinkProperties linkProperties = new LinkProperties();
+
+		if (options.containsKey("feature")) {
+			linkProperties.setFeature(options.getString("feature"));
+		}
+		if (options.containsKey("alias")) {
+			linkProperties.setAlias(options.getString("alias"));
+		}
+		if (options.containsKey("channel")) {
+			linkProperties.setChannel(options.getString("channel"));
+		}
+		if (options.containsKey("stage")) {
+			linkProperties.setStage(options.getString("stage"));
+		}
+		if (options.containsKey("duration")) {
+			linkProperties.setDuration(options.getInt("duration"));
+		}
+
+		if (options.containsKey("tags")) {
+			ArrayList<String> tags = (ArrayList<String>) options.get("tags");
+			for (String tag : tags) {
+				 linkProperties.addTag(tag);
+			}
+		}
+
+		if (controlParams.containsKey("$fallback_url")) {
+			Log.d(LCAT, "addControlParameter $fallback_url");
+			linkProperties.addControlParameter("$fallback_url", controlParams.getString("$fallback_url"));
+		}
+		if (controlParams.containsKey("$desktop_url")) {
+			Log.d(LCAT, "addControlParameter $desktop_url");
+			linkProperties.addControlParameter("$desktop_url", controlParams.getString("$desktop_url"));
+		}
+		if (controlParams.containsKey("$android_url")) {
+			Log.d(LCAT, "addControlParameter $android_url");
+			linkProperties.addControlParameter("$android_url", controlParams.getString("$android_url"));
+		}
+		if (controlParams.containsKey("$ios_url")) {
+			Log.d(LCAT, "addControlParameter $ios_url");
+			linkProperties.addControlParameter("$ios_url", controlParams.getString("$ios_url"));
+		}
+		if (controlParams.containsKey("$ipad_url")) {
+			Log.d(LCAT, "addControlParameter $ipad_url");
+			linkProperties.addControlParameter("$ipad_url", controlParams.getString("$ipad_url"));
+		}
+		if (controlParams.containsKey("$fire_url")) {
+			Log.d(LCAT, "addControlParameter $fire_url");
+			linkProperties.addControlParameter("$fire_url", controlParams.getString("$fire_url"));
+		}
+		if (controlParams.containsKey("$blackberry_url")) {
+			Log.d(LCAT, "addControlParameter $blackberry_url");
+			linkProperties.addControlParameter("$blackberry_url", controlParams.getString("$blackberry_url"));
+		}
+		if (controlParams.containsKey("$windows_phone_url")) {
+			Log.d(LCAT, "addControlParameter $windows_phone_url");
+			linkProperties.addControlParameter("$windows_phone_url", controlParams.getString("$windows_phone_url"));
+		}
+
+		return linkProperties;
+	}
+
 	//----------- Inner Classes: Listeners ----------//
     protected class GenerateShortUrlListener implements Branch.BranchLinkCreateListener
     {
     	@Override
 	    public void onLinkCreate(String url, BranchError error) {
 	    	Log.d(LCAT, "inside onLinkCreate");
+	    	BranchUniversalObjectProxy self = BranchUniversalObjectProxy.this;
 	        if (error == null) {
-	        	BranchUniversalObjectProxy self = BranchUniversalObjectProxy.this;
 	            Log.d(LCAT, "link to share: " + url);
 	            self.fireEvent("bio:generateShortUrl", url);
 	        } else {
 	        	Log.d(LCAT, error.getMessage());
+	        	self.fireEvent("bio:generateShortUrl", error.getMessage());
 	        }
 	    }
     }
+
+    protected class ShowShareSheetListener implements Branch.BranchLinkShareListener
+    {
+    	@Override
+	    public void onShareLinkDialogLaunched() {
+	    	Log.d(LCAT, "inside onShareLinkDialogLaunched");
+	    	BranchUniversalObjectProxy self = BranchUniversalObjectProxy.this;
+	    	self.fireEvent("bio:shareLinkDialogLaunched", null);
+	    }
+
+	    @Override
+	    public void onShareLinkDialogDismissed() {
+	    	Log.d(LCAT, "inside onShareLinkDialogDismissed");
+	    	BranchUniversalObjectProxy self = BranchUniversalObjectProxy.this;
+	    	self.fireEvent("bio:shareLinkDialogDismissed", null);
+	    }
+
+	    @Override
+	    public void onLinkShareResponse(String sharedLink, String sharedChannel, BranchError error) {
+	    	Log.d(LCAT, "inside onLinkCreate");
+	    	BranchUniversalObjectProxy self = BranchUniversalObjectProxy.this;
+	    	if (error == null) {
+	    		KrollDict response = new KrollDict();
+	    		response.put("sharedLink", sharedLink);
+	    		response.put("sharedChannel", sharedChannel);
+	            Log.d(LCAT, "sharedLink: " + sharedLink);
+	            Log.d(LCAT, "sharedChannel: " + sharedChannel);
+	            self.fireEvent("bio:shareLinkResponse", response);
+	        } else {
+	        	Log.d(LCAT, error.getMessage());
+	        	self.fireEvent("bio:shareLinkResponse", error.getMessage());
+	        }
+	    }
+
+	    @Override
+	    public void onChannelSelected(String channelName) {
+	    	Log.d(LCAT, "inside onChannelSelected");
+	    	Log.d(LCAT, "channelName: " + channelName);
+	    	BranchUniversalObjectProxy self = BranchUniversalObjectProxy.this;
+	    	self.fireEvent("bio:shareLinkResponse", channelName);
+	    }
+	}
 }

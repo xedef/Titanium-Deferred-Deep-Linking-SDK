@@ -308,6 +308,16 @@ function printBranchData(data) {
 //         Ti.API.debug("contentImageUrl " + proxy.getContentImageUrl());
 //         Ti.API.debug("isPublicallyIndexable " + proxy.isPublicallyIndexable());
 
+// proxy.showShareSheet({
+//     "feature"  : "feature",
+//     "alias"    : "alias",
+//     "channel"  : "channel",
+//     "stage"    : "stage",
+//     "duration" : 1
+// }, {
+//     "$fallback_url" : "$fallback_url"
+// });
+
 //         proxy.generateShortUrl({
 //             "feature" : "feature",
 //             "alias" : "alias",

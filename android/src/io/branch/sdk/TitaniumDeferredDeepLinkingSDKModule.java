@@ -186,10 +186,10 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
         @Override
         public void onInitFinished(JSONObject referringParams, BranchError error) {
         	Log.d(LCAT, "inside onInitFinished");
+        	TitaniumDeferredDeepLinkingSDKModule self = TitaniumDeferredDeepLinkingSDKModule.this;
         	if (error == null) {
 	            // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
 	            // params will be empty if no data found
-	            TitaniumDeferredDeepLinkingSDKModule self = TitaniumDeferredDeepLinkingSDKModule.this;
 	        	if (referringParams == null) {
 	        		Log.d(LCAT, "return is null");
 	        		return;
@@ -201,6 +201,7 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	        	self.fireEvent("bio:initSession", createSessionDict(referringParams));
 	        } else {
 	            Log.d(LCAT, error.getMessage());
+	            self.fireEvent("bio:initSession", error.getMessage());
 	        }
         }
     }
