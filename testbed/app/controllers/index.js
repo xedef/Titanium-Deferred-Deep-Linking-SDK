@@ -85,9 +85,7 @@ $.initializeHandlers = function() {
     $.customActionButton.addEventListener('click', $.onCustomActionButtonClicked);
 
     // Branch Listeners
-    if (OS_ANDROID) {
-        branch.addEventListener("bio:initSession", $.onInitSessionFinish);
-    }
+    branch.addEventListener("bio:initSession", $.onInitSessionFinish);
 
     // Add global event handlers to hide/show custom indicator
     Titanium.App.addEventListener('show_indicator', function(e) {
@@ -125,15 +123,36 @@ $.onInitSessionFinish = function(data) {
 $.onGetSessionButtonClicked = function(data) {
     Ti.API.debug("inside onGetSessionButtonClicked");
     var sessionParams = branch.getLatestReferringParams();
-    Ti.API.debug("session parameters:");
-    printBranchData(sessionParams);
+
+    if (OS_ANDROID) {
+        Ti.API.debug("session parameters:");
+        printBranchData(sessionParams);
+    } else if (OS_IOS) {
+        var dialog = Ti.UI.createAlertDialog({
+            title  : "session parameters:",
+            message: ""+JSON.stringify(sessionParams),
+            buttonNames: ["OK"],
+        });
+
+        dialog.show();
+    }
 }
 
 $.onGetInstallSessionButtonClicked = function(data) {
     Ti.API.debug("inside onGetInstallSessionButtonClicked");
     var installParams = branch.getFirstReferringParams();
-    Ti.API.debug("install parameters:");
-    printBranchData(installParams);
+    if (OS_ANDROID) {
+        Ti.API.debug("install parameters:");
+        printBranchData(installParams);
+    } else if (OS_IOS) {
+        var dialog = Ti.UI.createAlertDialog({
+            title  : "install parameters:",
+            message: ""+JSON.stringify(installParams),
+            buttonNames: ["OK"],
+        });
+
+        dialog.show();
+    }
 }
 
 $.onSetIdentityButtonClicked = function(data) {
@@ -142,8 +161,27 @@ $.onSetIdentityButtonClicked = function(data) {
     if (OS_ANDROID) {
         branch.setIdentity($.identityTextField.getValue());
         Ti.API.debug("set identity: " + $.identityTextField.getValue());
-    } else {
+    } else if (OS_IOS) {
+        branch.setIdentity($.identityTextField.getValue(), function(params, success){
+            var dialog = null;
+            if (success) {
+                dialog = Ti.UI.createAlertDialog({
+                    title  : "set identity:",
+                    message: ""+$.identityTextField.getValue(),
+                    buttonNames: ["OK"],
+                });
+            }
+            else {
+                dialog = Ti.UI.createAlertDialog({
+                    title  : "set identity:",
+                    message: "Set Identity FAILED",
+                    buttonNames: ["OK"],
+                });
+            }
+            dialog.show();
+        });
 
+        
     }
 }
 

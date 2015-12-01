@@ -63,7 +63,7 @@
 
 - (void)_listenerAdded:(NSString *)type count:(int)count
 {
-	if (count == 1 && [type isEqualToString:@"my_event"])
+	if (count == 1 && [type isEqualToString:@"bio:initSession"])
 	{
 		// the first (of potentially many) listener is being added
 		// for event named 'my_event'
@@ -72,7 +72,7 @@
 
 - (void)_listenerRemoved:(NSString *)type count:(int)count
 {
-	if (count == 0 && [type isEqualToString:@"my_event"])
+	if (count == 0 && [type isEqualToString:@"bio:initSession"])
 	{
 		// the last listener called for event named 'my_event' has
 		// been removed, we can optionally clean up any resources
@@ -117,7 +117,8 @@
     NSDictionary *launchOptions = [[TiApp app] launchOptions];
     
     [branch initSessionWithLaunchOptions:launchOptions];
-    NSLog(@"session initialized");
+    
+    [self fireEvent:@"bio:initSession" withObject:@{}];
 }
 
 - (void)initSessionIsReferrable:(id)args
@@ -128,6 +129,8 @@
     BOOL isReferrable = [TiUtils boolValue:args];
     
     [branch initSession:isReferrable];
+    
+    [self fireEvent:@"bio:initSession" withObject:@{}];
 }
 
 - (void)initSessionAndAutomaticallyDisplayDeepLinkController:(id)args
@@ -139,6 +142,8 @@
     BOOL automaticallyDisplayController = [TiUtils boolValue:arg];
     
     [branch initSessionAndAutomaticallyDisplayDeepLinkController:automaticallyDisplayController];
+    
+    [self fireEvent:@"bio:initSession" withObject:@{}];
 }
 
 - (void)initSessionWithLaunchOptionsAndAutomaticallyDisplayDeepLinkController:(id)args
@@ -154,9 +159,11 @@
     [branch initSessionWithLaunchOptions:launchOptions automaticallyDisplayDeepLinkController:display deepLinkHandler:^(NSDictionary *params, NSError *error) {
         if (!error) {
             [deepLinkHandler call:@[params, NUMBOOL(YES)] thisObject:nil];
+            [self fireEvent:@"bio:initSession" withObject:params];
         }
         else {
             [deepLinkHandler call:@[params, NUMBOOL(NO)] thisObject:nil];
+            [self fireEvent:@"bio:initSession" withObject:params];
         }
     }];
 }
@@ -221,6 +228,19 @@
 }
 
 
+#pragma mark - register controller
+
+- (void)registerDeepLinkController:(id)args
+{
+    ENSURE_SINGLE_ARG(args, NSString);
+    
+    UIViewController <BranchDeepLinkingController> *controller = (UIViewController <BranchDeepLinkingController>*)[TiApp app].controller;
+    Branch *branch = [self getInstance];
+    
+    [branch registerDeepLinkController:controller forKey:args];
+}
+
+
 #pragma mark - handle deep link
 
 - (id)handleDeepLink:(id)args
@@ -257,10 +277,20 @@
     return [branch getContentUrlWithParams:params andChannel:channel];
 }
 
+- (void)getBranchActivityItemWithParams:(id)args
+{
+    ENSURE_SINGLE_ARG(args, NSDictionary);
+    
+    UIActivityItemProvider *provider = [Branch getBranchActivityItemWithParams:args];
+    UIActivityViewController *shareViewController = [[UIActivityViewController alloc] initWithActivityItems:@[ provider ] applicationActivities:nil];
+    
+    [[TiApp app] showModalController:shareViewController animated:YES];
+}
+
 
 #pragma mark - logout
 
-- (void)logout
+- (void)logout:(id)args
 {
     Branch *branch = [self getInstance];
     [branch logout];
