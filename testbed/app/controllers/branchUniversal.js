@@ -112,6 +112,7 @@ $.initializeHandlers = function() {
         }
         showIndicator(e.title);
     });
+
     Titanium.App.addEventListener('hide_indicator', function(e) {
         hideIndicator();
     });
@@ -147,7 +148,7 @@ $.onGenerateUrlButtonClicked = function() {
     Ti.API.info("inside onGenerateUrlButtonClicked");
     branchUniversalObjectProxy.generateShortUrl({
         "feature" : "sample-feature",
-        "alias" : "sample-alias",
+        "alias" : $.aliasTextField.getValue(),
         "channel" : "sample-channel",
         "stage" : "sample-stage",
         "duration" : 1,
@@ -165,7 +166,7 @@ $.onShareSheetButtonClicked = function() {
     Ti.API.info("inside onShareSheetButtonClicked");
     branchUniversalObjectProxy.showShareSheet({
         "feature" : "share-feature",
-        "alias" : "share-alias",
+        "alias" : $.aliasTextField.getValue(),
         "channel" : "share-channel",
         "stage" : "share-stage",
         "duration" : 1,

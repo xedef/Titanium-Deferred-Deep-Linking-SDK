@@ -1,10 +1,13 @@
 <Alloy>
 	<Window id="window" class="container">
         <View class="first-section">
-            <Button class="first-section-btn first-layer menu-left" title="Init Branch" id="initBranchButton"/>
-            <Button class="first-section-btn first-layer menu-right" title="Register View" id="registerViewButton"/>
-            <Button class="first-section-btn second-layer menu-left" title="Generate Url" id="generateUrlButton"/>
-            <Button class="first-section-btn second-layer menu-right" title="Share Sheet" id="shareSheetButton"/>
+            <Button class="first-section-btn first-layer menu-left" title="init Branch" id="initBranchButton"/>
+            <Button class="first-section-btn first-layer menu-right" title="register View" id="registerViewButton"/>
+        </View>
+        <View class="second-section">
+            <Button class="second-section-btn first-layer" title="generate Url" id="generateUrlButton"/>
+            <Button class="second-section-btn second-layer" title="share Sheet" id="shareSheetButton"/>
+            <TextField class="second-section-textfield first-layer menu-left" id="aliasTextField"/>
         </View>
     </Window>
 </Alloy>
