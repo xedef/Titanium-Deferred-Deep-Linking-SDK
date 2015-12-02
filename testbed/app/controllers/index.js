@@ -73,7 +73,7 @@ $.initialize = function(params) {
 };
 
 $.initializeViews = function() {
-    Ti.API.debug("start initializeViews");
+    Ti.API.info("start initializeViews");
 };
 
 $.initializeHandlers = function() {
@@ -83,9 +83,11 @@ $.initializeHandlers = function() {
     $.getInstallSessionButton.addEventListener('click', $.onGetInstallSessionButtonClicked);
     $.setIndentityButton.addEventListener('click', $.onSetIdentityButtonClicked);
     $.customActionButton.addEventListener('click', $.onCustomActionButtonClicked);
+    $.branchUniversalButton.addEventListener('click', $.onBranchUniversalButtonClicked);
 
     // Branch Listeners
-    branch.addEventListener("bio:initSession", $.onInitSessionFinish);
+    branch.addEventListener("bio:initSession", $.onInitSessionFinished);
+
 
     // Add global event handlers to hide/show custom indicator
     Titanium.App.addEventListener('show_indicator', function(e) {
@@ -108,20 +110,20 @@ $.initializeHandlers = function() {
  ************************************************
  */
 $.onInitSessionButtonClicked = function() {
-    Ti.API.debug("inside onInitSessionButtonClicked");
+    Ti.API.info("inside onInitSessionButtonClicked");
     branch.initSession();
     Ti.App.fireEvent("show_indicator");
 }
 
-$.onInitSessionFinish = function(data) {
-    Ti.API.debug("inside onInitSessionFinish");
+$.onInitSessionFinished = function(data) {
+    Ti.API.info("inside onInitSessionFinished");
     printBranchData(data);
     $.toggleButtons(true);
     Ti.App.fireEvent("hide_indicator");
 }
 
-$.onGetSessionButtonClicked = function(data) {
-    Ti.API.debug("inside onGetSessionButtonClicked");
+$.onGetSessionButtonClicked = function() {
+    Ti.API.info("inside onGetSessionButtonClicked");
     var sessionParams = branch.getLatestReferringParams();
 
     if (OS_ANDROID) {
@@ -133,14 +135,14 @@ $.onGetSessionButtonClicked = function(data) {
             message: ""+JSON.stringify(sessionParams),
             buttonNames: ["OK"],
         });
-
         dialog.show();
     }
 }
 
-$.onGetInstallSessionButtonClicked = function(data) {
-    Ti.API.debug("inside onGetInstallSessionButtonClicked");
+$.onGetInstallSessionButtonClicked = function() {
+    Ti.API.info("inside onGetInstallSessionButtonClicked");
     var installParams = branch.getFirstReferringParams();
+
     if (OS_ANDROID) {
         Ti.API.debug("install parameters:");
         printBranchData(installParams);
@@ -150,13 +152,12 @@ $.onGetInstallSessionButtonClicked = function(data) {
             message: ""+JSON.stringify(installParams),
             buttonNames: ["OK"],
         });
-
         dialog.show();
     }
 }
 
-$.onSetIdentityButtonClicked = function(data) {
-    Ti.API.debug("inside onSetIdentityButtonClicked");
+$.onSetIdentityButtonClicked = function() {
+    Ti.API.info("inside onSetIdentityButtonClicked");
 
     if (OS_ANDROID) {
         branch.setIdentity($.identityTextField.getValue());
@@ -180,19 +181,24 @@ $.onSetIdentityButtonClicked = function(data) {
             }
             dialog.show();
         });
-
-        
     }
 }
 
-$.onCustomActionButtonClicked = function(data) {
-    Ti.API.debug("inside onCustomActionButtonClicked");
+$.onCustomActionButtonClicked = function() {
+    Ti.API.info("inside onCustomActionButtonClicked");
     branch.userCompletedAction($.customActionTextField.getValue());
-    Ti.API.debug("user completed action: " + $.customActionTextField.getValue());
+    Ti.API.info("user completed action: " + $.customActionTextField.getValue());
+}
+
+$.onBranchUniversalButtonClicked = function() {
+    Ti.API.info("inside onBranchUniversalButtonClicked");
+    var branchUniversalWin = Alloy.createController('branchUniversal', {});
+    view = branchUniversalWin.getView();
+    view.open();
 }
 
 $.onLogoutSessionButtonClicked = function() {
-    Ti.API.debug("inside onLogoutSessionButtonClicked");
+    Ti.API.info("inside onLogoutSessionButtonClicked");
     branch.logout();
     alert("Successfully logged out of session.");
     $.toggleButtons(false);
@@ -211,45 +217,46 @@ $.toggleButtons = function(enable) {
     $.customActionButton.enabled = enable;
     $.identityTextField.enabled = enable;
     $.customActionTextField.enabled = enable;
+    $.branchUniversalButton.enabled = enable;
 }
 
 function printBranchData(data) {
-    Ti.API.debug("start bio:initSession");
+    Ti.API.info("start bio:initSession");
     if (data["~channel"] != null) {
-        Ti.API.debug("channel " + data["~channel"]);
+        Ti.API.info("channel " + data["~channel"]);
     }
     if (data["~feature"] != null) {
-        Ti.API.debug("feature " + data["~feature"]);
+        Ti.API.info("feature " + data["~feature"]);
     }
     if (data["~tags"] != null) {
-        Ti.API.debug("tags " + data["~tags"]);
+        Ti.API.info("tags " + data["~tags"]);
     }
     if (data["~campaign"] != null) {
-        Ti.API.debug("campaign " + data["~campaign"]);
+        Ti.API.info("campaign " + data["~campaign"]);
     }
     if (data["~stage"] != null) {
-        Ti.API.debug("stage " + data["~stage"]);
+        Ti.API.info("stage " + data["~stage"]);
     }
     if (data["~creation_source"] != null) {
-        Ti.API.debug("creationSource " + data["~creation_source"]);
+        Ti.API.info("creationSource " + data["~creation_source"]);
     }
     if (data["+match_guaranteed"] != null) {
-        Ti.API.debug("matchGuaranteed " + data["+match_guaranteed"]);
+        Ti.API.info("matchGuaranteed " + data["+match_guaranteed"]);
     }
     if (data["+referrer"] != null) {
-        Ti.API.debug("referrer " + data["+referrer"]);
+        Ti.API.info("referrer " + data["+referrer"]);
     }
     if (data["+phone_number"] != null) {
-        Ti.API.debug("phoneNumber " + data["+phone_number"]);
+        Ti.API.info("phoneNumber " + data["+phone_number"]);
     }
     if (data["+is_first_session"] != null) {
-        Ti.API.debug("isFirstSession " + data["+is_first_session"]);
+        Ti.API.info("isFirstSession " + data["+is_first_session"]);
     }
     if (data["+clicked_branch_link"] != null) {
-        Ti.API.debug("clickedBranchLink " + data["+clicked_branch_link"]);
+        Ti.API.info("clickedBranchLink " + data["+clicked_branch_link"]);
     }
     if (data["+click_timestamp"] != null) {
-        Ti.API.debug("clickTimestamp " + data["+click_timestamp"]);
+        Ti.API.info("clickTimestamp " + data["+click_timestamp"]);
     }
 }
 

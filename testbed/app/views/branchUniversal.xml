@@ -1,0 +1,10 @@
+<Alloy>
+	<Window id="window" class="container">
+        <View class="first-section">
+            <Button class="first-section-btn first-layer menu-left" title="Init Branch" id="initBranchButton"/>
+            <Button class="first-section-btn first-layer menu-right" title="Register View" id="registerViewButton"/>
+            <Button class="first-section-btn second-layer menu-left" title="Generate Url" id="generateUrlButton"/>
+            <Button class="first-section-btn second-layer menu-right" title="Share Sheet" id="shareSheetButton"/>
+        </View>
+    </Window>
+</Alloy>

@@ -436,7 +436,7 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 	    	Log.d(LCAT, "inside onChannelSelected");
 	    	Log.d(LCAT, "channelName: " + channelName);
 	    	BranchUniversalObjectProxy self = BranchUniversalObjectProxy.this;
-	    	self.fireEvent("bio:shareLinkResponse", channelName);
+	    	self.fireEvent("bio:shareChannelSelected", channelName);
 	    }
 	}
 }
