@@ -61,6 +61,22 @@
     "height"          : "32%",
 }
 
+".small-btn" : {
+    "width"  : "30%"
+}
+
+".small-btn-first" : {
+    "left"  : "3%"
+}
+
+".small-btn-second" : {
+    "left"  : "36%"
+}
+
+".small-btn-third" : {
+    "left"  : "69%"
+}
+
 ".menu-left" : {
     "left"  : "3%"
 }

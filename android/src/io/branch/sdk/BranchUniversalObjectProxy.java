@@ -11,6 +11,19 @@ package io.branch.sdk;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 
+import io.branch.indexing.BranchUniversalObject;
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
+import io.branch.referral.BranchShortLinkBuilder;
+import io.branch.referral.Defines;
+import io.branch.referral.SharingHelper;
+import io.branch.referral.util.LinkProperties;
+import io.branch.referral.util.ShareSheetStyle;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
@@ -25,20 +38,6 @@ import org.appcelerator.titanium.view.TiCompositeLayout.LayoutArrangement;
 import org.appcelerator.titanium.view.TiUIView;
 
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-
-import io.branch.indexing.BranchUniversalObject;
-import io.branch.referral.Branch;
-import io.branch.referral.BranchError;
-import io.branch.referral.BranchShortLinkBuilder;
-import io.branch.referral.Defines;
-import io.branch.referral.util.LinkProperties;
-
-import io.branch.referral.SharingHelper;
-import io.branch.referral.util.ShareSheetStyle;
 
 
 // This proxy can be created by calling TitaniumDeferredDeepLinkingSDK.createBranchUniversalObject({key: object, ...})
@@ -393,7 +392,7 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 	            self.fireEvent("bio:generateShortUrl", url);
 	        } else {
 	        	Log.d(LCAT, error.getMessage());
-	        	self.fireEvent("bio:generateShortUrl", error.getMessage());
+	        	self.fireEvent("bio:generateShortUrl", {"error" : error.getMessage()});
 	        }
 	    }
     }
@@ -427,7 +426,7 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 	            self.fireEvent("bio:shareLinkResponse", response);
 	        } else {
 	        	Log.d(LCAT, error.getMessage());
-	        	self.fireEvent("bio:shareLinkResponse", error.getMessage());
+	        	self.fireEvent("bio:shareLinkResponse", {"error" : error.getMessage()});
 	        }
 	    }
 

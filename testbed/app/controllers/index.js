@@ -85,10 +85,15 @@ $.initializeHandlers = function() {
     $.getInstallSessionButton.addEventListener('click', $.onGetInstallSessionButtonClicked);
     $.setIndentityButton.addEventListener('click', $.onSetIdentityButtonClicked);
     $.customActionButton.addEventListener('click', $.onCustomActionButtonClicked);
+    $.rewardBalanceButton.addEventListener('click', $.onRewardBalanceButtonClicked);
+    $.redeemRewardButton.addEventListener('click', $.onRedeemRewardButtonClicked);
+    $.creditHistoryButton.addEventListener('click', $.onCreditHistoryButtonClicked);
     $.branchUniversalButton.addEventListener('click', $.onBranchUniversalButtonClicked);
 
     // Branch Listeners
     branch.addEventListener("bio:initSession", $.onInitSessionFinished);
+    branch.addEventListener("bio:loadRewards", $.onLoadRewardFinished);
+    branch.addEventListener("bio:getCreditHistory", $.onGetCreditHistoryFinished);
 
     // Add global event handlers to hide/show custom indicator
     Titanium.App.addEventListener('show_indicator', function(e) {
@@ -165,6 +170,31 @@ $.onBranchUniversalButtonClicked = function() {
     view.open();
 }
 
+$.onRewardBalanceButtonClicked = function() {
+    Ti.API.info("inside onRewardBalanceButtonClicked");
+    branch.loadRewards();
+}
+
+$.onLoadRewardFinished = function(data) {
+    Ti.API.info("inside onLoadRewardFinished");
+    showData(data);
+}
+
+$.onRedeemRewardButtonClicked = function() {
+    Ti.API.info("inside onRedeemRewardButtonClicked");
+    branch.redeemRewards(5);
+}
+
+$.onCreditHistoryButtonClicked = function() {
+    Ti.API.info("inside onCreditHistoryButtonClicked");
+    branch.getCreditHistory();
+}
+
+$.onGetCreditHistoryFinished = function(data) {
+    Ti.API.info("inside onGetCreditHistoryFinished");
+    showData(data);
+}
+
 $.onLogoutSessionButtonClicked = function() {
     Ti.API.info("inside onLogoutSessionButtonClicked");
     branch.logout();
@@ -192,52 +222,28 @@ function showData(data) {
     Ti.API.info("start showData");
 
     if (USE_ALERT) {
+        var dict = {};
+        for (key in data) {
+            if (key != "type" && key != "source" && key != "bubbles" && key != "cancelBubble") {
+                dict[key] = data[key];
+            }
+        }
+
         if (OS_ANDROID) {
-            alert(JSON.stringify(data));
+            alert(JSON.stringify(dict));
         } else if (OS_IOS){
             var dialog = Ti.UI.createAlertDialog({
                 title  : "Result:",
-                message: "" + JSON.stringify(data),
+                message: "" + JSON.stringify(dict),
                 buttonNames: ["OK"],
             });
             dialog.show();
         }
     } else {
-        if (data["~channel"] != null) {
-            Ti.API.info("channel " + data["~channel"]);
-        }
-        if (data["~feature"] != null) {
-            Ti.API.info("feature " + data["~feature"]);
-        }
-        if (data["~tags"] != null) {
-            Ti.API.info("tags " + data["~tags"]);
-        }
-        if (data["~campaign"] != null) {
-            Ti.API.info("campaign " + data["~campaign"]);
-        }
-        if (data["~stage"] != null) {
-            Ti.API.info("stage " + data["~stage"]);
-        }
-        if (data["~creation_source"] != null) {
-            Ti.API.info("creationSource " + data["~creation_source"]);
-        }
-        if (data["+match_guaranteed"] != null) {
-            Ti.API.info("matchGuaranteed " + data["+match_guaranteed"]);
-        }
-        if (data["+referrer"] != null) {
-            Ti.API.info("referrer " + data["+referrer"]);
-        }
-        if (data["+phone_number"] != null) {
-            Ti.API.info("phoneNumber " + data["+phone_number"]);
-        }
-        if (data["+is_first_session"] != null) {
-            Ti.API.info("isFirstSession " + data["+is_first_session"]);
-        }
-        if (data["+clicked_branch_link"] != null) {
-            Ti.API.info("clickedBranchLink " + data["+clicked_branch_link"]);
-        }
-        if (data["+click_timestamp"] != null) {
-            Ti.API.info("clickTimestamp " + data["+click_timestamp"]);
+        for (key in data) {
+            if ((key != "type" && key != "source" && key != "bubbles" && key != "cancelBubble") && data[key] != null) {
+                Ti.API.info(key + data["key"]);
+            }
         }
     }
 }

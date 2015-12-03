@@ -13,7 +13,10 @@
             <TextField class="second-section-textfield second-layer menu-left" id="customActionTextField"/>
         </View>
         <View class="third-section">
-            <Button class="third-section-btn first-layer" title="Branch Universal Object" id="branchUniversalButton"/>
+            <Button class="third-section-btn first-layer small-btn small-btn-first" title="Reward Balance" id="rewardBalanceButton"/>
+            <Button class="third-section-btn first-layer small-btn small-btn-second" title="Redeem Reward" id="redeemRewardButton"/>
+            <Button class="third-section-btn first-layer small-btn small-btn-third" title="Credit History" id="creditHistoryButton"/>
+            <Button class="third-section-btn second-layer" title="Branch Universal Object" id="branchUniversalButton"/>
         </View>
     </Window>
 </Alloy>

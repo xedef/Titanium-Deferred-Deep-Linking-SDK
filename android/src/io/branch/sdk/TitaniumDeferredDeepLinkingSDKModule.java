@@ -10,6 +10,12 @@ package io.branch.sdk;
 
 import android.app.Activity;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
+
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 
@@ -18,10 +24,9 @@ import org.appcelerator.kroll.common.Log;
 import org.appcelerator.kroll.common.TiConfig;
 import org.appcelerator.kroll.KrollDict;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-
-import io.branch.referral.Branch;
-import io.branch.referral.BranchError;
 
 
 @Kroll.module(name="TitaniumDeferredDeepLinkingSDK", id="io.branch.sdk")
@@ -128,6 +133,36 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	}
 
 	@Kroll.method
+	public void loadRewards()
+	{
+		Log.d(LCAT, "start loadRewards");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		instance.loadRewards(new LoadRewardsListener());
+	}
+
+	@Kroll.method
+	public void redeemRewards(int value)
+	{
+		Log.d(LCAT, "start redeemRewards");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		instance.redeemRewards(value);
+	}
+
+	@Kroll.method
+	public void getCreditHistory()
+	{
+		Log.d(LCAT, "start getCreditHistory");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		instance.getCreditHistory(new CreditHistoryListener());
+	}
+
+	@Kroll.method
 	public void logout()
 	{
 		Log.d(LCAT, "start logout");
@@ -139,6 +174,7 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 
 	// Private Methods
 	private KrollDict createSessionDict(JSONObject data) {
+		Log.d(LCAT, "start createSessionDict");
 		KrollDict sessionDict = new KrollDict();
 		if (data.has("~channel")) {
 			sessionDict.put("~channel", data.optString("~channel"));
@@ -179,6 +215,35 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
     	return sessionDict;
 	}
 
+	private KrollDict parseJSONObject(JSONObject jsonObject) {
+		Log.d(LCAT, "start parseJSONObject");
+		KrollDict dict = new KrollDict();
+		Iterator<?> keys = jsonObject.keys();
+
+		while(keys.hasNext()) {
+		    String key = (String)keys.next();
+		    Log.d(LCAT, "processing key: " + key);
+		    if (jsonObject.opt(key) instanceof JSONObject) {
+		    	Log.d(LCAT, "recursing...");
+		    	JSONObject jsonObj;
+		    	try {
+					jsonObj = jsonObject.getJSONObject(key);
+					KrollDict tempDict = new KrollDict();
+			    	tempDict = parseJSONObject(jsonObj);
+			    	dict.put(key, tempDict);
+				}
+				catch (JSONException exception) {
+					Log.d(LCAT, "invalid json passed");
+				}
+    		} else {
+    			Log.d(LCAT, "not recursing...");
+    			dict.put(key, jsonObject.opt(key));
+    		}
+		}
+
+		return dict;
+	}
+
 	//----------- Inner Classes: Listeners ----------//
     protected class SessionListener implements Branch.BranchReferralInitListener
     {
@@ -206,5 +271,60 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
         }
     }
 
+    protected class LoadRewardsListener implements Branch.BranchReferralStateChangedListener
+    {
+    	// Listener that implements BranchReferralStateChangedListener for loadRewards
+    	@Override
+	    public void onStateChanged(boolean changed, BranchError error) {
+	        // changed boolean will indicate if the balance changed from what is currently in memory
+	        Log.d(LCAT, "inside onStateChanged");
+	        TitaniumDeferredDeepLinkingSDKModule self = TitaniumDeferredDeepLinkingSDKModule.this;
+	        if (error == null) {
+	            // will return the balance of the current user's credits
+	            final Activity activity = self.getActivity();
+				final Branch instance = Branch.getInstance(activity);
+	        	int credits = instance.getCredits();
+	        	self.fireEvent("bio:loadRewards", {"credits" : credits});
+	        } else {
+	            Log.d(LCAT, error.getMessage());
+	            self.fireEvent("bio:loadRewards", {"error" : error.getMessage()});
+	        }
+
+	    }
+    }
+
+    protected class CreditHistoryListener implements Branch.BranchListResponseListener
+    {
+    	// Listener that implements BranchListResponseListener for getCreditHistory
+    	@Override
+	    public void onReceivingResponse(JSONArray list, BranchError error) {
+	        // changed boolean will indicate if the balance changed from what is currently in memory
+	        Log.d(LCAT, "inside onReceivingResponse");
+	        TitaniumDeferredDeepLinkingSDKModule self = TitaniumDeferredDeepLinkingSDKModule.this;
+	        if (error == null) {
+	            // show the list in your app
+	            ArrayList<KrollDict> data = new ArrayList<KrollDict>();
+				if (list != null) {
+					int len = list.length();
+					for (int i = 0; i < len; i++) {
+						JSONObject jsonObject;
+						try {
+							jsonObject = list.getJSONObject(i);
+							KrollDict dict = parseJSONObject(jsonObject);
+							data.add(dict);
+						}
+						catch (JSONException exception) {
+							Log.d(LCAT, "invalid json passed");
+							return;
+						}
+					}
+				}
+	            self.fireEvent("bio:getCreditHistory", data);
+	        } else {
+	            Log.d(LCAT, error.getMessage());
+	            self.fireEvent("bio:getCreditHistory", {"error" : error.getMessage()});
+	        }
+	    }
+    }
 }
 
