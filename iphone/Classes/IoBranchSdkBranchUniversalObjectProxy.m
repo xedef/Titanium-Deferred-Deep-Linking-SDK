@@ -1,14 +1,15 @@
 //
-//  IoBranchSdkBranchUniversalProxy.m
+//  IoBranchSdkBranchUniversalObjectProxy.m
 //  Titanium-Deferred-Deep-Linking-SDK
 //
 //  Created by Kevin Milo on 26/11/2015.
 //
 //
 
-#import "IoBranchSdkBranchUniversalProxy.h"
+#import "IoBranchSdkBranchUniversalObjectProxy.h"
+#import "TiApp.h"
 
-@implementation IoBranchSdkBranchUniversalProxy
+@implementation IoBranchSdkBranchUniversalObjectProxy
 
 -(id)init
 {
@@ -87,6 +88,10 @@
                 self.branchUniversalObj.contentIndexMode = ContentIndexModePublic;
             }
         }
+        else if ([key isEqualToString:@"contentImageUrl"]){
+            NSString *imageUrl = [properties valueForKey:key];
+            self.branchUniversalObj.imageUrl = imageUrl;
+        }
         else {
             [self.branchUniversalObj setValue:[properties objectForKey:key] forKey:key];
         }
@@ -130,6 +135,66 @@
 {
     ENSURE_ARG_COUNT(args, 0);
     [self.branchUniversalObj registerView];
+}
+
+
+#pragma mark - generate URL
+- (NSString *)generateShortUrl:(id)args
+{
+    ENSURE_ARG_COUNT(args, 2);
+    ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
+    ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
+    
+    NSDictionary *arg1 = [args objectAtIndex:0];
+    NSDictionary *arg2 = [args objectAtIndex:1];
+    
+    BranchLinkProperties *props = [[BranchLinkProperties alloc] init];
+    
+    for (id key in arg1) {
+        if ([key isEqualToString:@"duration"]) {
+            props.matchDuration = (NSUInteger)[((NSNumber *)[arg1 objectForKey:key]) integerValue];
+        }
+        else {
+            [props setValue:[arg1 objectForKey:key] forKey:key];
+        }
+    }
+    
+    for (id key in arg2) {
+        [props addControlParam:key withValue:[arg1 objectForKey:key]];
+    }
+    return [self.branchUniversalObj getShortUrlWithLinkProperties:props];
+}
+
+- (void)showShareSheet:(id)args
+{
+    ENSURE_ARG_COUNT(args, 2);
+    ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
+    ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
+    
+    NSDictionary *arg1 = [args objectAtIndex:0];
+    NSDictionary *arg2 = [args objectAtIndex:1];
+    
+    BranchLinkProperties *props = [[BranchLinkProperties alloc] init];
+    
+    for (id key in arg1) {
+        if ([key isEqualToString:@"duration"]) {
+            props.matchDuration = (NSUInteger)[((NSNumber *)[arg1 objectForKey:key]) integerValue];
+        }
+        else {
+            [props setValue:[arg1 objectForKey:key] forKey:key];
+        }
+    }
+    
+    for (id key in arg2) {
+        [props addControlParam:key withValue:[arg1 objectForKey:key]];
+    }
+    
+    UIActivityItemProvider *provider = [self.branchUniversalObj getBranchActivityItemWithLinkProperties:props];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIActivityViewController *shareViewController = [[UIActivityViewController alloc] initWithActivityItems:@[ provider ] applicationActivities:nil];
+        
+        [[TiApp app] showModalController:shareViewController animated:YES];
+    });
 }
 
 @end

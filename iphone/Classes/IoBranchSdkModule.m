@@ -36,7 +36,7 @@
 	// this method is called when the module is first loaded
 	// you *must* call the superclass
 	[super startup];
-
+    
 	NSLog(@"[INFO] %@ loaded",self);
 }
 
@@ -256,9 +256,52 @@
 
 #pragma mark - URL methods
 
+- (NSString *)getShortURL:(id)args
+{
+    ENSURE_ARG_COUNT(args, 0);
+    
+    Branch *branch = [self getInstance];
+    return [branch getShortURL];
+}
+
+- (id)getShortURLWithParams:(id)args
+{
+    Branch *branch = [self getInstance];
+    NSDictionary *params = nil;
+    KrollCallback *callback = nil;
+    
+    // if a callback is passed as an argument
+    if ([args count]==2) {
+        ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
+        params = [args objectAtIndex:0];
+        
+        ENSURE_TYPE([args objectAtIndex:1], KrollCallback);
+        callback = [args objectAtIndex:1];
+    }
+    else {
+        ENSURE_SINGLE_ARG(args, NSDictionary);
+        params = (NSDictionary *)args;
+    }
+    
+    if (!callback){
+        return [branch getShortURLWithParams:params];
+    }
+    else {
+        [branch getShortURLWithParams:params andCallback:^(NSString *url, NSError *error) {
+            if (!error){
+                [callback call:@[url, NUMBOOL(YES)] thisObject:nil];
+            }
+            else {
+                [callback call:@[url, NUMBOOL(NO)] thisObject:nil];
+            }
+        }];
+    }
+}
+
 - (NSString *)getLongURLWithParams:(id)args
 {
     ENSURE_SINGLE_ARG(args, NSDictionary);
+    
     id params = [args objectAtIndex:0];
     return [[self getInstance] getLongURLWithParams:params];
 }
@@ -280,11 +323,15 @@
 - (void)getBranchActivityItemWithParams:(id)args
 {
     ENSURE_SINGLE_ARG(args, NSDictionary);
+    ENSURE_UI_THREAD(getBranchActivityItemWithParams, args);
     
     UIActivityItemProvider *provider = [Branch getBranchActivityItemWithParams:args];
-    UIActivityViewController *shareViewController = [[UIActivityViewController alloc] initWithActivityItems:@[ provider ] applicationActivities:nil];
     
-    [[TiApp app] showModalController:shareViewController animated:YES];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIActivityViewController *shareViewController = [[UIActivityViewController alloc] initWithActivityItems:@[ provider ] applicationActivities:nil];
+        
+        [[TiApp app] showModalController:shareViewController animated:YES];
+    });
 }
 
 
@@ -292,6 +339,8 @@
 
 - (void)logout:(id)args
 {
+    ENSURE_ARG_COUNT(args, 0);
+    
     Branch *branch = [self getInstance];
     [branch logout];
 }

@@ -142,22 +142,12 @@ $.onSetIdentityButtonClicked = function() {
         Ti.API.debug("set identity: " + $.identityTextField.getValue());
     } else if (OS_IOS) {
         branch.setIdentity($.identityTextField.getValue(), function(params, success){
-            var dialog = null;
             if (success) {
-                dialog = Ti.UI.createAlertDialog({
-                    title  : "set identity:",
-                    message: "" + $.identityTextField.getValue(),
-                    buttonNames: ["OK"],
-                });
+                alert("set identity: "+JSON.stringify(params));
             }
             else {
-                dialog = Ti.UI.createAlertDialog({
-                    title  : "set identity:",
-                    message: "Set Identity FAILED",
-                    buttonNames: ["OK"],
-                });
+                alert("Set Identity FAILED");
             }
-            dialog.show();
         });
     }
 }

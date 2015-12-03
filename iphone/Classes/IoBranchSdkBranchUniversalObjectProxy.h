@@ -1,5 +1,5 @@
 //
-//  IoBranchSdkBranchUniversalProxy.h
+//  IoBranchSdkBranchUniversalObjectProxy.h
 //  Titanium-Deferred-Deep-Linking-SDK
 //
 //  Created by Kevin Milo on 26/11/2015.
@@ -8,8 +8,9 @@
 
 #import "TiProxy.h"
 #import "BranchUniversalObject.h"
+#import "BranchLinkProperties.h"
 
-@interface IoBranchSdkBranchUniversalProxy : TiProxy
+@interface IoBranchSdkBranchUniversalObjectProxy : TiProxy
 
 @property (copy) NSString *canonicalIdentifier;
 @property (copy) NSString *title;
