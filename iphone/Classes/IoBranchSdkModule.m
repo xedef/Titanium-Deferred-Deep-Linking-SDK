@@ -335,6 +335,60 @@
 }
 
 
+#pragma mark - Referral Reward System
+
+- (void)loadRewards:(id)args
+{
+    ENSURE_ARG_COUNT(args, 0);
+    
+    Branch *branch = [self getInstance];
+    
+    [branch loadRewardsWithCallback:^(BOOL changed, NSError *error) {
+        if(!error) {
+            NSNumber *credits = [NSNumber numberWithInteger:[branch getCredits]];
+            [self fireEvent:@"bio:loadRewards" withObject:@{@"balance":credits}];
+        }
+        else {
+            [self fireEvent:@"bio:loadRewards:ERROR" withObject:@{@"error":[error localizedDescription]}];
+        }
+    }];
+}
+
+- (void)redeemRewards:(id)args
+{
+    ENSURE_SINGLE_ARG(args, NSNumber);
+    
+    NSInteger amount = ((NSNumber *)args).integerValue;
+    Branch *branch = [self getInstance];
+    
+    //[branch redeemRewards:amount];
+    [branch redeemRewards:amount callback:^(BOOL changed, NSError *error) {
+        if (!error) {
+            [self fireEvent:@"bio:redeemRewards" withObject:@{}];
+        }
+        else {
+            [self fireEvent:@"bio:redeemRewards:ERROR" withObject:@{@"error":[error localizedDescription]}];
+        }
+    }];
+}
+
+- (void)getCreditHistory:(id)args
+{
+    ENSURE_ARG_COUNT(args, 0);
+    
+    Branch *branch = [self getInstance];
+    
+    [branch getCreditHistoryWithCallback:^(NSArray *list, NSError *error) {
+        if (!error) {
+            [self fireEvent:@"bio:getCreditHistory" withObject:@{@"history":list}];
+        }
+        else {
+            [self fireEvent:@"bio:getCreditHistory:ERROR" withObject:@{@"error":[error localizedDescription]}];
+        }
+    }];
+}
+
+
 #pragma mark - logout
 
 - (void)logout:(id)args

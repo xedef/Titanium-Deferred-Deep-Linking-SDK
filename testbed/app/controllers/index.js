@@ -94,6 +94,8 @@ $.initializeHandlers = function() {
     branch.addEventListener("bio:initSession", $.onInitSessionFinished);
     branch.addEventListener("bio:loadRewards", $.onLoadRewardFinished);
     branch.addEventListener("bio:getCreditHistory", $.onGetCreditHistoryFinished);
+    branch.addEventListener("bio:redeemRewards", $.onRedeemRewardSuccess);
+    branch.addEventListener("bio:redeemRewards:ERROR", $.onRedeemRewardFailed);
 
     // Add global event handlers to hide/show custom indicator
     Titanium.App.addEventListener('show_indicator', function(e) {
@@ -192,6 +194,16 @@ $.onCreditHistoryButtonClicked = function() {
 
 $.onGetCreditHistoryFinished = function(data) {
     Ti.API.info("inside onGetCreditHistoryFinished");
+    showData(data);
+}
+
+$.onRedeemRewardSuccess = function(data) {
+    Ti.API.info("redeem reward SUCCEEDED");
+    showData(data);
+}
+
+$.onRedeemRewardFailed = function(data) {
+    Ti.API.info("redeem reward FAILED");
     showData(data);
 }
 
