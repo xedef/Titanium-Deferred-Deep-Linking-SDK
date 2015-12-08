@@ -392,7 +392,7 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 	            self.fireEvent("bio:generateShortUrl", url);
 	        } else {
 	        	Log.d(LCAT, error.getMessage());
-	        	self.fireEvent("bio:generateShortUrl", {"error" : error.getMessage()});
+	        	self.fireEvent("bio:generateShortUrl", error.getMessage());
 	        }
 	    }
     }
@@ -417,17 +417,17 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 	    public void onLinkShareResponse(String sharedLink, String sharedChannel, BranchError error) {
 	    	Log.d(LCAT, "inside onLinkCreate");
 	    	BranchUniversalObjectProxy self = BranchUniversalObjectProxy.this;
+	    	KrollDict response = new KrollDict();
 	    	if (error == null) {
-	    		KrollDict response = new KrollDict();
 	    		response.put("sharedLink", sharedLink);
 	    		response.put("sharedChannel", sharedChannel);
 	            Log.d(LCAT, "sharedLink: " + sharedLink);
 	            Log.d(LCAT, "sharedChannel: " + sharedChannel);
-	            self.fireEvent("bio:shareLinkResponse", response);
 	        } else {
 	        	Log.d(LCAT, error.getMessage());
-	        	self.fireEvent("bio:shareLinkResponse", {"error" : error.getMessage()});
+	        	response.put("error", error.getMessage());
 	        }
+	        self.fireEvent("bio:shareLinkResponse", response);
 	    }
 
 	    @Override

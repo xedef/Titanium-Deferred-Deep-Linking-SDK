@@ -65,6 +65,16 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	}
 
 	@Kroll.method
+	public void setDebug()
+	{
+		Log.d(LCAT, "start setDebug");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getInstance(activity);
+
+		instance.setDebug();
+	}
+
+	@Kroll.method
 	public KrollDict getLatestReferringParams()
 	{
 		Log.d(LCAT, "start getLatestReferringParams");
@@ -266,7 +276,9 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	        	self.fireEvent("bio:initSession", createSessionDict(referringParams));
 	        } else {
 	            Log.d(LCAT, error.getMessage());
-	            self.fireEvent("bio:initSession", error.getMessage());
+	            KrollDict response = new KrollDict();
+	            response.put("error", error.getMessage());
+	            self.fireEvent("bio:initSession", response);
 	        }
         }
     }
@@ -279,16 +291,18 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	        // changed boolean will indicate if the balance changed from what is currently in memory
 	        Log.d(LCAT, "inside onStateChanged");
 	        TitaniumDeferredDeepLinkingSDKModule self = TitaniumDeferredDeepLinkingSDKModule.this;
+	        KrollDict response = new KrollDict();
 	        if (error == null) {
 	            // will return the balance of the current user's credits
 	            final Activity activity = self.getActivity();
 				final Branch instance = Branch.getInstance(activity);
 	        	int credits = instance.getCredits();
-	        	self.fireEvent("bio:loadRewards", {"credits" : credits});
+	        	response.put("credits", credits);
 	        } else {
 	            Log.d(LCAT, error.getMessage());
-	            self.fireEvent("bio:loadRewards", {"error" : error.getMessage()});
+	            response.put("error", error.getMessage());
 	        }
+	        self.fireEvent("bio:loadRewards", response);
 
 	    }
     }
@@ -322,7 +336,9 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	            self.fireEvent("bio:getCreditHistory", data);
 	        } else {
 	            Log.d(LCAT, error.getMessage());
-	            self.fireEvent("bio:getCreditHistory", {"error" : error.getMessage()});
+	            KrollDict response = new KrollDict();
+	            response.put("error", error.getMessage());
+	            self.fireEvent("bio:getCreditHistory", response);
 	        }
 	    }
     }
