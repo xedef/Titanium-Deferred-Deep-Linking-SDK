@@ -399,4 +399,34 @@
     [branch logout];
 }
 
+
+#pragma mark - custom events
+
+- (void)userCompletedAction:(id)args
+{
+    NSString *name;
+    NSDictionary *state;
+    // if a callback is passed as an argument
+    if ([args count]==2) {
+        ENSURE_TYPE([args objectAtIndex:0], NSString);
+        name = [args objectAtIndex:0];
+        
+        ENSURE_TYPE([args objectAtIndex:1], NSDictionary);
+        state = [args objectAtIndex:1];
+    }
+    else {
+        ENSURE_SINGLE_ARG(args, NSString);
+        name = (NSString *)args;
+    }
+    
+    Branch *branch = [self getInstance];
+    
+    if (state) {
+        [branch userCompletedAction:name withState:state];
+    }
+    else {
+        [branch userCompletedAction:name];
+    }
+}
+
 @end
