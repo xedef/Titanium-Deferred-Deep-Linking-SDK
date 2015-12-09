@@ -10,6 +10,14 @@ _____
 
 
 
+## Installation
+
+To use the module, go to the `android/iphone` folder's respective `dist` folders.
+Inside, you should be able to find the compressed module. Extract the contents to your
+titanium `modules` folder
+
+
+
 
 
 
