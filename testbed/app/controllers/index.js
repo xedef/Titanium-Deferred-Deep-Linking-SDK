@@ -94,8 +94,7 @@ $.initializeHandlers = function() {
     branch.addEventListener("bio:initSession", $.onInitSessionFinished);
     branch.addEventListener("bio:loadRewards", $.onLoadRewardFinished);
     branch.addEventListener("bio:getCreditHistory", $.onGetCreditHistoryFinished);
-    branch.addEventListener("bio:redeemRewards", $.onRedeemRewardSuccess);
-    branch.addEventListener("bio:redeemRewards:ERROR", $.onRedeemRewardFailed);
+    branch.addEventListener("bio:redeemRewards", $.onRedeemRewardFinished);
 
     // Add global event handlers to hide/show custom indicator
     Titanium.App.addEventListener('show_indicator', function(e) {
@@ -150,7 +149,7 @@ $.onSetIdentityButtonClicked = function() {
     } else if (OS_IOS) {
         branch.setIdentity($.identityTextField.getValue(), function(params, success){
             if (success) {
-                alert("set identity: "+JSON.stringify(params));
+                alert("identity set: "+$.identityTextField.getValue());
             }
             else {
                 alert("Set Identity FAILED");
@@ -197,13 +196,8 @@ $.onGetCreditHistoryFinished = function(data) {
     showData(data);
 }
 
-$.onRedeemRewardSuccess = function(data) {
-    Ti.API.info("redeem reward SUCCEEDED");
-    showData(data);
-}
-
-$.onRedeemRewardFailed = function(data) {
-    Ti.API.info("redeem reward FAILED");
+$.onRedeemRewardFinished = function(data) {
+    Ti.API.info("redeem reward finished");
     showData(data);
 }
 

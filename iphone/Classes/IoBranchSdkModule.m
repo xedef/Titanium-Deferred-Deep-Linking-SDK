@@ -103,8 +103,9 @@
     return [Branch getTestInstance];
 }
 
-- (void)setDebug
+- (void)setDebug:(id)args
 {
+    ENSURE_ARG_COUNT(args, 0);
     [[Branch getInstance] setDebug];
 }
 
@@ -114,11 +115,15 @@
 - (void)initSession:(id)args
 {
     Branch *branch = [self getInstance];
-    NSDictionary *launchOptions = [[TiApp app] launchOptions];
     
-    [branch initSessionWithLaunchOptions:launchOptions];
-    
-    [self fireEvent:@"bio:initSession" withObject:@{}];
+    [branch initSessionAndRegisterDeepLinkHandler:^(NSDictionary *params, NSError *error) {
+        if (!error) {
+            [self fireEvent:@"bio:initSession" withObject:params];
+        }
+        else {
+            [self fireEvent:@"bio:initSession" withObject:@{@"error":[error localizedDescription]}];
+        }
+    }];
 }
 
 - (void)initSessionIsReferrable:(id)args
@@ -128,9 +133,14 @@
     Branch *branch = [self getInstance];
     BOOL isReferrable = [TiUtils boolValue:args];
     
-    [branch initSession:isReferrable];
-    
-    [self fireEvent:@"bio:initSession" withObject:@{}];
+    [branch initSession:isReferrable andRegisterDeepLinkHandler:^(NSDictionary *params, NSError *error) {
+        if (!error) {
+            [self fireEvent:@"bio:initSession" withObject:params];
+        }
+        else {
+            [self fireEvent:@"bio:initSession" withObject:@{@"error":[error localizedDescription]}];
+        }
+    }];
 }
 
 - (void)initSessionAndAutomaticallyDisplayDeepLinkController:(id)args
@@ -141,9 +151,14 @@
     id arg = [args objectAtIndex:0];
     BOOL automaticallyDisplayController = [TiUtils boolValue:arg];
     
-    [branch initSessionAndAutomaticallyDisplayDeepLinkController:automaticallyDisplayController];
-    
-    [self fireEvent:@"bio:initSession" withObject:@{}];
+    [branch initSessionWithLaunchOptions:nil automaticallyDisplayDeepLinkController:automaticallyDisplayController deepLinkHandler:^(NSDictionary *params, NSError *error) {
+        if (!error) {
+            [self fireEvent:@"bio:initSession" withObject:params];
+        }
+        else {
+            [self fireEvent:@"bio:initSession" withObject:@{@"error":[error localizedDescription]}];
+        }
+    }];
 }
 
 - (void)initSessionWithLaunchOptionsAndAutomaticallyDisplayDeepLinkController:(id)args
@@ -163,7 +178,7 @@
         }
         else {
             [deepLinkHandler call:@[params, NUMBOOL(NO)] thisObject:nil];
-            [self fireEvent:@"bio:initSession" withObject:params];
+            [self fireEvent:@"bio:initSession" withObject:@{@"error":[error localizedDescription]}];
         }
     }];
 }
@@ -346,10 +361,10 @@
     [branch loadRewardsWithCallback:^(BOOL changed, NSError *error) {
         if(!error) {
             NSNumber *credits = [NSNumber numberWithInteger:[branch getCredits]];
-            [self fireEvent:@"bio:loadRewards" withObject:@{@"balance":credits}];
+            [self fireEvent:@"bio:loadRewards" withObject:@{@"credits":credits}];
         }
         else {
-            [self fireEvent:@"bio:loadRewards:ERROR" withObject:@{@"error":[error localizedDescription]}];
+            [self fireEvent:@"bio:loadRewards" withObject:@{@"error":[error localizedDescription]}];
         }
     }];
 }
@@ -364,10 +379,10 @@
     //[branch redeemRewards:amount];
     [branch redeemRewards:amount callback:^(BOOL changed, NSError *error) {
         if (!error) {
-            [self fireEvent:@"bio:redeemRewards" withObject:@{}];
+            [self fireEvent:@"bio:redeemRewards" withObject:@{@"error":[NSNull null]}];
         }
         else {
-            [self fireEvent:@"bio:redeemRewards:ERROR" withObject:@{@"error":[error localizedDescription]}];
+            [self fireEvent:@"bio:redeemRewards" withObject:@{@"error":[error localizedDescription]}];
         }
     }];
 }
@@ -380,10 +395,10 @@
     
     [branch getCreditHistoryWithCallback:^(NSArray *list, NSError *error) {
         if (!error) {
-            [self fireEvent:@"bio:getCreditHistory" withObject:@{@"history":list}];
+            [self fireEvent:@"bio:getCreditHistory" withObject:list];
         }
         else {
-            [self fireEvent:@"bio:getCreditHistory:ERROR" withObject:@{@"error":[error localizedDescription]}];
+            [self fireEvent:@"bio:getCreditHistory" withObject:@{@"error":[error localizedDescription]}];
         }
     }];
 }
@@ -406,7 +421,7 @@
 {
     NSString *name;
     NSDictionary *state;
-    // if a callback is passed as an argument
+    // if a state dictionary is passed as an argument
     if ([args count]==2) {
         ENSURE_TYPE([args objectAtIndex:0], NSString);
         name = [args objectAtIndex:0];
