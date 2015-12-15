@@ -12,6 +12,45 @@
 #import "TiUtils.h"
 
 #import "Branch-SDK/Branch.h"
+#import "JRSwizzle.h"
+
+@implementation TiApp (Branch)
+
+-(BOOL)branchApplication:(UIApplication *)app openURL:(NSURL *)url sourceApplication:(NSString *)source annotation:(id)annotation {
+    NSLog(@"[INFO] swizzling application:openURL");
+    
+    [TiApp jr_swizzleMethod:@selector(application:openURL:sourceApplication:annotation:) withMethod:@selector(branchApplication:openURL:sourceApplication:annotation:) error:nil];
+    BOOL res = [self branchApplication:app openURL:url sourceApplication:source annotation:annotation];
+    [TiApp jr_swizzleMethod:@selector(application:openURL:sourceApplication:annotation:) withMethod:@selector(branchApplication:openURL:sourceApplication:annotation:) error:nil];
+    
+    BOOL handledByBranch = [[Branch getInstance] handleDeepLink:url];
+    
+    return handledByBranch;
+}
+
+-(BOOL)branchApplication:(UIApplication *)app handleOpenURL:(NSURL *)url {
+    NSLog(@"[INFO] swizzling application:handleOpenURL");
+    
+    [TiApp jr_swizzleMethod:@selector(application:handleOpenURL:) withMethod:@selector(branchApplication:handleOpenURL:) error:nil];
+    BOOL res = [self branchApplication:app handleOpenURL:url];
+    [TiApp jr_swizzleMethod:@selector(application:handleOpenURL:) withMethod:@selector(branchApplication:handleOpenURL:) error:nil];
+    
+    return res;
+}
+
+- (BOOL)branchApplication:(UIApplication *)app continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {
+    NSLog(@"[INFO] swizzling application:continueUserActivity");
+    
+    [TiApp jr_swizzleMethod:@selector(application:continueUserActivity:restorationHandler:) withMethod:@selector(branchApplication:continueUserActivity:restorationHandler:) error:nil];
+    BOOL res = [self branchApplication:app continueUserActivity:userActivity restorationHandler:restorationHandler];
+    [TiApp jr_swizzleMethod:@selector(application:continueUserActivity:restorationHandler:) withMethod:@selector(branchApplication:continueUserActivity:restorationHandler:) error:nil];
+    
+    BOOL handledByBranch = [[Branch getInstance] continueUserActivity:userActivity];
+    
+    return handledByBranch;
+}
+
+@end
 
 @implementation IoBranchSdkModule
 
@@ -38,6 +77,39 @@
 	[super startup];
     
 	NSLog(@"[INFO] %@ loaded",self);
+    
+    if([[TiApp app] respondsToSelector:@selector(application:openURL:sourceApplication:annotation:)]) {
+        NSError *error = nil;
+        [TiApp jr_swizzleMethod:@selector(application:openURL:sourceApplication:annotation:) withMethod:@selector(branchApplication:openURL:sourceApplication:annotation:) error:&error];
+        if(error) {
+            NSLog(@"[WARN] Cannot swizzle openURL delegate: %@", error);
+        }
+        else {
+            NSLog(@"[INFO] Done swizzling openURL delegate");
+        }
+    }
+    
+    if([[TiApp app] respondsToSelector:@selector(application:continueUserActivity:restorationHandler:)]) {
+        NSError *error = nil;
+        [TiApp jr_swizzleMethod:@selector(application:continueUserActivity:restorationHandler:) withMethod:@selector(branchApplication:continueUserActivity:restorationHandler:) error:&error];
+        if(error) {
+            NSLog(@"[WARN] Cannot swizzle continueUserActivity delegate: %@", error);
+        }
+        else {
+            NSLog(@"[INFO] Done swizzling continueUserActivity delegate");
+        }
+    }
+    
+    if([[TiApp app] respondsToSelector:@selector(application:handleOpenURL:)]) {
+        NSError *error = nil;
+        [TiApp jr_swizzleMethod:@selector(application:handleOpenURL:) withMethod:@selector(branchApplication:handleOpenURL:) error:&error];
+        if(error) {
+            NSLog(@"[WARN] Cannot swizzle handleOpenURL delegate: %@", error);
+        }
+        else {
+            NSLog(@"[INFO] Done swizzling handleOpenURL delegate");
+        }
+    }
 }
 
 - (void)shutdown:(id)sender
@@ -442,6 +514,28 @@
     else {
         [branch userCompletedAction:name];
     }
+}
+
+
+#pragma mark - continue user activity
+
+- (void)continueUserActivity:(id)args
+{
+    ENSURE_ARG_COUNT(args, 2);
+    ENSURE_TYPE([args objectAtIndex:0], NSString);
+    ENSURE_TYPE([args objectAtIndex:1], NSDictionary);
+    
+    NSString *activityType = (NSString *)[args objectAtIndex:0];
+    NSDictionary *userInfo = (NSDictionary*)[args objectAtIndex:1];
+        
+    NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:activityType];
+    [userActivity setUserInfo:userInfo];
+    
+    Branch *branch = [self getInstance];
+    
+    NSLog(@"[INFO] module continueUserActivity");
+    
+    [branch continueUserActivity:userActivity];
 }
 
 @end

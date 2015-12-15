@@ -111,6 +111,8 @@
 		AACBBE4A0F95108600F1A2B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AACBBE490F95108600F1A2B1 /* Foundation.framework */; };
 		D60359871C067C1600ACC6C5 /* IoBranchSdkBranchUniversalObjectProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = D60359851C067C1600ACC6C5 /* IoBranchSdkBranchUniversalObjectProxy.h */; };
 		D60359881C067C1600ACC6C5 /* IoBranchSdkBranchUniversalObjectProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D60359861C067C1600ACC6C5 /* IoBranchSdkBranchUniversalObjectProxy.m */; };
+		D6DC185D1C1F99EE0054E63C /* JRSwizzle.h in Headers */ = {isa = PBXBuildFile; fileRef = D6DC185B1C1F99EE0054E63C /* JRSwizzle.h */; };
+		D6DC185E1C1F99EE0054E63C /* JRSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = D6DC185C1C1F99EE0054E63C /* JRSwizzle.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -215,6 +217,8 @@
 		D2AAC07E0554694100DB518D /* libIoBranchSdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIoBranchSdk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D60359851C067C1600ACC6C5 /* IoBranchSdkBranchUniversalObjectProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IoBranchSdkBranchUniversalObjectProxy.h; path = Classes/IoBranchSdkBranchUniversalObjectProxy.h; sourceTree = "<group>"; };
 		D60359861C067C1600ACC6C5 /* IoBranchSdkBranchUniversalObjectProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IoBranchSdkBranchUniversalObjectProxy.m; path = Classes/IoBranchSdkBranchUniversalObjectProxy.m; sourceTree = "<group>"; };
+		D6DC185B1C1F99EE0054E63C /* JRSwizzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JRSwizzle.h; path = Classes/JRSwizzle/JRSwizzle.h; sourceTree = "<group>"; };
+		D6DC185C1C1F99EE0054E63C /* JRSwizzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JRSwizzle.m; path = Classes/JRSwizzle/JRSwizzle.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -259,6 +263,7 @@
 		08FB77AEFE84172EC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				D6DC185A1C1F99970054E63C /* JRSwizzle */,
 				65C3E9D11BF2EEF700733060 /* Branch-SDK */,
 				24DE9E0F11C5FE74003F90F6 /* IoBranchSdkModuleAssets.h */,
 				24DE9E1011C5FE74003F90F6 /* IoBranchSdkModuleAssets.m */,
@@ -376,6 +381,15 @@
 			path = Requests;
 			sourceTree = "<group>";
 		};
+		D6DC185A1C1F99970054E63C /* JRSwizzle */ = {
+			isa = PBXGroup;
+			children = (
+				D6DC185B1C1F99EE0054E63C /* JRSwizzle.h */,
+				D6DC185C1C1F99EE0054E63C /* JRSwizzle.m */,
+			);
+			name = JRSwizzle;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -392,6 +406,7 @@
 				65C3EA651BF2EEF800733060 /* BranchRedeemRewardsRequest.h in Headers */,
 				65C3EA631BF2EEF800733060 /* BranchOpenRequest.h in Headers */,
 				65C3EA5D1BF2EEF800733060 /* BranchLoadRewardsRequest.h in Headers */,
+				D6DC185D1C1F99EE0054E63C /* JRSwizzle.h in Headers */,
 				65C3EA4F1BF2EEF800733060 /* BranchCloseRequest.h in Headers */,
 				65C3EA441BF2EEF800733060 /* BranchDeepLinkingController.h in Headers */,
 				AA747D9F0F9514B9006C5449 /* IoBranchSdk_Prefix.pch in Headers */,
@@ -512,6 +527,7 @@
 				65C3EA621BF2EEF800733060 /* BranchLogRequest.m in Sources */,
 				65C3EA3A1BF2EEF700733060 /* BNCSystemObserver.m in Sources */,
 				65C3EA681BF2EEF800733060 /* BranchRegisterViewRequest.m in Sources */,
+				D6DC185E1C1F99EE0054E63C /* JRSwizzle.m in Sources */,
 				65C3EA461BF2EEF800733060 /* BranchLinkProperties.m in Sources */,
 				D60359881C067C1600ACC6C5 /* IoBranchSdkBranchUniversalObjectProxy.m in Sources */,
 				65C3EA701BF2EEF800733060 /* BranchSpotlightUrlRequest.m in Sources */,

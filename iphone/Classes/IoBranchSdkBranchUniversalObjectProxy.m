@@ -139,7 +139,7 @@
 
 
 #pragma mark - generate URL
-- (NSString *)generateShortUrl:(id)args
+- (void)generateShortUrl:(id)args
 {
     ENSURE_ARG_COUNT(args, 2);
     ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
@@ -162,36 +162,70 @@
     for (id key in arg2) {
         [props addControlParam:key withValue:[arg1 objectForKey:key]];
     }
-    return [self.branchUniversalObj getShortUrlWithLinkProperties:props];
+    
+    [self.branchUniversalObj getShortUrlWithLinkProperties:props andCallback:^(NSString *url, NSError *error) {
+        if (!error) {
+            [self fireEvent:@"bio:generateShortUrl" withObject:url];
+        }
+        else {
+            [self fireEvent:@"bio:generateShortUrl" withObject:@{@"error":[error localizedDescription]}];
+        }
+    }];
 }
 
 - (void)showShareSheet:(id)args
 {
-    ENSURE_ARG_COUNT(args, 2);
-    ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
-    ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
+    NSString *shareText = nil;
+    
+    if ([args count]==2) {
+        ENSURE_ARG_COUNT(args, 2);
+        ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
+        ENSURE_TYPE([args objectAtIndex:1], NSDictionary);
+    }
+    else if ([args count]==3) {
+        ENSURE_ARG_COUNT(args, 3);
+        ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
+        ENSURE_TYPE([args objectAtIndex:1], NSDictionary);
+        ENSURE_TYPE([args objectAtIndex:2], NSString);
+        
+        shareText = [args objectAtIndex:2];
+    }
     
     NSDictionary *arg1 = [args objectAtIndex:0];
     NSDictionary *arg2 = [args objectAtIndex:1];
     
-    BranchLinkProperties *props = [[BranchLinkProperties alloc] init];
+    BranchLinkProperties *linkProperties = [[BranchLinkProperties alloc] init];
     
     for (id key in arg1) {
         if ([key isEqualToString:@"duration"]) {
-            props.matchDuration = (NSUInteger)[((NSNumber *)[arg1 objectForKey:key]) integerValue];
+            linkProperties.matchDuration = (NSUInteger)[((NSNumber *)[arg1 objectForKey:key]) integerValue];
         }
         else {
-            [props setValue:[arg1 objectForKey:key] forKey:key];
+            [linkProperties setValue:[arg1 objectForKey:key] forKey:key];
         }
     }
     
     for (id key in arg2) {
-        [props addControlParam:key withValue:[arg1 objectForKey:key]];
+        [linkProperties addControlParam:key withValue:[arg1 objectForKey:key]];
     }
     
-    UIActivityItemProvider *provider = [self.branchUniversalObj getBranchActivityItemWithLinkProperties:props];
+    UIActivityItemProvider *itemProvider = [self.branchUniversalObj getBranchActivityItemWithLinkProperties:linkProperties];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIActivityViewController *shareViewController = [[UIActivityViewController alloc] initWithActivityItems:@[ provider ] applicationActivities:nil];
+        NSMutableArray *items = [NSMutableArray arrayWithObject:itemProvider];
+        if (shareText) {
+            [items addObject:shareText];
+        }
+        UIActivityViewController *shareViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
+        
+        if (linkProperties.controlParams[@"$email_subject"]) {
+            @try {
+                [shareViewController setValue:linkProperties.controlParams[@"$email_subject"] forKey:@"subject"];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"[Branch warning] Unable to setValue 'emailSubject' forKey 'subject' on UIActivityViewController.");
+            }
+        }
         
         [[TiApp app] showModalController:shareViewController animated:YES];
     });
