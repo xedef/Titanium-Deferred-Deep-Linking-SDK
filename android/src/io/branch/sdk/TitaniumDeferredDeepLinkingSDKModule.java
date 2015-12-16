@@ -65,13 +65,25 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	}
 
 	@Kroll.method
-	public void setDebug()
+	public void getAutoInstance()
+	{
+		Log.d(LCAT, "start getAutoInstance");
+		final Activity activity = this.getActivity();
+		final Branch instance = Branch.getAutoInstance(TiApplication.getInstance());
+
+		instance.initSession(new SessionListener(), activity.getIntent().getData(), activity);
+	}
+
+	@Kroll.method
+	public void setDebug(boolean enable)
 	{
 		Log.d(LCAT, "start setDebug");
 		final Activity activity = this.getActivity();
 		final Branch instance = Branch.getInstance(activity);
 
-		instance.setDebug();
+		if (enable) {
+			instance.setDebug();
+		}
 	}
 
 	@Kroll.method

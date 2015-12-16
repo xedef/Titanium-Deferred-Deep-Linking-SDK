@@ -1,7 +1,7 @@
 <Alloy>
 	<Window id="window" class="container">
         <View class="first-section">
-            <Button class="first-section-btn first-layer menu-left" title="init Branch" id="initBranchButton"/>
+            <Button class="first-section-btn first-layer menu-left" title="init BUO" id="initBranchButton"/>
             <Button class="first-section-btn first-layer menu-right" title="register View" id="registerViewButton"/>
         </View>
         <View class="second-section">

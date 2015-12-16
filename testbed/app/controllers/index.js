@@ -68,10 +68,15 @@ function hideIndicator() {
  ************************************************
  */
 $.initialize = function(params) {
+    $.window.open();
+
     $.initializeViews();
     $.initializeHandlers();
-    $.window.open();
-    $.toggleButtons(false);
+
+    Ti.API.info("start initSession");
+    branch.setDebug(true);
+    branch.getAutoInstance();
+    Ti.App.fireEvent("show_indicator");
 };
 
 $.initializeViews = function() {
@@ -79,8 +84,22 @@ $.initializeViews = function() {
 };
 
 $.initializeHandlers = function() {
-    $.initSessionButton.addEventListener('click', $.onInitSessionButtonClicked);
-    $.logoutSessionButton.addEventListener('click', $.onLogoutSessionButtonClicked);
+    // Android Activity Listeners
+    if (OS_ANDROID) {
+        Ti.Android.currentActivity.addEventListener("open", function(e) {
+            Ti.API.info("inside open");
+        });
+
+        Ti.Android.currentActivity.addEventListener("newintent", function(e) {
+            Ti.API.info("inside newintent: " + e);
+            $.window.open();
+            branch.setDebug(true);
+            branch.getAutoInstance();
+            Ti.App.fireEvent("show_indicator");
+
+        });
+    }
+
     $.getSessionButton.addEventListener('click', $.onGetSessionButtonClicked);
     $.getInstallSessionButton.addEventListener('click', $.onGetInstallSessionButtonClicked);
     $.setIndentityButton.addEventListener('click', $.onSetIdentityButtonClicked);
@@ -116,16 +135,9 @@ $.initializeHandlers = function() {
  * Event Handlers
  ************************************************
  */
-$.onInitSessionButtonClicked = function() {
-    Ti.API.info("inside onInitSessionButtonClicked");
-    branch.initSession();
-    Ti.App.fireEvent("show_indicator");
-}
-
 $.onInitSessionFinished = function(data) {
     Ti.API.info("inside onInitSessionFinished");
     showData(data);
-    $.toggleButtons(true);
     Ti.App.fireEvent("hide_indicator");
 }
 
@@ -145,7 +157,7 @@ $.onSetIdentityButtonClicked = function() {
     Ti.API.info("inside onSetIdentityButtonClicked");
     if (OS_ANDROID) {
         branch.setIdentity($.identityTextField.getValue());
-        Ti.API.debug("set identity: " + $.identityTextField.getValue());
+        showData({"setIdentity":$.identityTextField.getValue()});
     } else if (OS_IOS) {
         branch.setIdentity($.identityTextField.getValue(), function(params, success){
             if (success) {
@@ -161,7 +173,7 @@ $.onSetIdentityButtonClicked = function() {
 $.onCustomActionButtonClicked = function() {
     Ti.API.info("inside onCustomActionButtonClicked");
     branch.userCompletedAction($.customActionTextField.getValue());
-    Ti.API.info("user completed action: " + $.customActionTextField.getValue());
+    showData({"userCompletedAction":$.customActionTextField.getValue()});
 }
 
 $.onBranchUniversalButtonClicked = function() {
@@ -184,6 +196,7 @@ $.onLoadRewardFinished = function(data) {
 $.onRedeemRewardButtonClicked = function() {
     Ti.API.info("inside onRedeemRewardButtonClicked");
     branch.redeemRewards(5);
+    showData({"redeemRewards":5});
 }
 
 $.onCreditHistoryButtonClicked = function() {
@@ -201,28 +214,11 @@ $.onRedeemRewardFinished = function(data) {
     showData(data);
 }
 
-$.onLogoutSessionButtonClicked = function() {
-    Ti.API.info("inside onLogoutSessionButtonClicked");
-    branch.logout();
-    alert("Successfully logged out of session.");
-    $.toggleButtons(false);
-}
-
 /*
  ************************************************
  * Methods
  ************************************************
  */
-$.toggleButtons = function(enable) {
-    $.logoutSessionButton.enabled = enable;
-    $.getSessionButton.enabled = enable;
-    $.getInstallSessionButton.enabled = enable;
-    $.setIndentityButton.enabled = enable;
-    $.customActionButton.enabled = enable;
-    $.identityTextField.enabled = enable;
-    $.customActionTextField.enabled = enable;
-    $.branchUniversalButton.enabled = enable;
-}
 
 function showData(data) {
     Ti.API.info("start showData");
