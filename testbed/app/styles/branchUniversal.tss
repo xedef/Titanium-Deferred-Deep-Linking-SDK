@@ -56,8 +56,17 @@
     "color"           : "white",
     "backgroundColor" : "darkGray",
     "borderColor"     : "black",
-    "left"            : "25%",
-    "width"           : "50%",
+    "left"            : "60%",
+    "width"           : "35%",
+    "height"          : "32%",
+}
+
+".third-section-textarea": {
+    "color"           : "black",
+    "backgroundColor" : "white",
+    "borderColor"     : "black",
+    "borderStyle"     : "Ti.UI.INPUT_BORDERSTYLE_ROUNDED",
+    "width"           : "55%",
     "height"          : "32%",
 }
 

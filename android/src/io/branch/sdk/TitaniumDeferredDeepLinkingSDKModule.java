@@ -287,9 +287,10 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 
 	        	self.fireEvent("bio:initSession", createSessionDict(referringParams));
 	        } else {
-	            Log.d(LCAT, error.getMessage());
+	        	String errorMessage = error.getMessage();
+	            Log.d(LCAT, errorMessage);
 	            KrollDict response = new KrollDict();
-	            response.put("error", error.getMessage());
+	            response.put("error", errorMessage);
 	            self.fireEvent("bio:initSession", response);
 	        }
         }
@@ -311,8 +312,9 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 	        	int credits = instance.getCredits();
 	        	response.put("credits", credits);
 	        } else {
-	            Log.d(LCAT, error.getMessage());
-	            response.put("error", error.getMessage());
+	        	String errorMessage = error.getMessage();
+	            Log.d(LCAT, errorMessage);
+	            response.put("error", errorMessage);
 	        }
 	        self.fireEvent("bio:loadRewards", response);
 
@@ -340,16 +342,17 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 							data.add(dict);
 						}
 						catch (JSONException exception) {
-							Log.d(LCAT, "invalid json passed");
+							Log.d(LCAT, "Invalid JSONObject passed");
 							return;
 						}
 					}
 				}
 	            self.fireEvent("bio:getCreditHistory", data);
 	        } else {
-	            Log.d(LCAT, error.getMessage());
+	        	String errorMessage = error.getMessage();
+	            Log.d(LCAT, errorMessage);
 	            KrollDict response = new KrollDict();
-	            response.put("error", error.getMessage());
+	            response.put("error", errorMessage);
 	            self.fireEvent("bio:getCreditHistory", response);
 	        }
 	    }

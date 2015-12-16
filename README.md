@@ -25,6 +25,7 @@ titanium `modules` folder
 
 1. Branch Session
   + [.initSession()](#initsession)
+  + [.getAutoSession()](#getAutoSession)
   + [.getLatestReferringParams()](#getlatestreferringparams)
   + [.getFirstReferringParams()](#getFirstReferringParams)
   + [.setIdentity(identity)](#setIdentity-identity)
@@ -93,6 +94,25 @@ Branch returns explicit parameters every time. Here is a list, and a description
 
 
 **Note:** `Branch.initSession()` must be called prior to calling any other Branch functions.
+
+___
+
+
+
+### getAutoSession()
+
+Initializes the branch instance with automatic session management. Implements same callback as of `initSession`.
+
+##### Usage
+```js
+branch.getAutoSession();
+```
+
+##### Callback
+Same as `initSession`.
+
+**Note:** `Branch.getAutoSession()` must be called prior to calling any other Branch functions.
+**Note:** `Branch.getAutoSession()` is available for `Android` only.
 
 ___
 
