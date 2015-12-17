@@ -177,7 +177,6 @@
 
 - (void)setDebug:(id)args
 {
-    ENSURE_ARG_COUNT(args, 0);
     [[Branch getInstance] setDebug];
 }
 
@@ -253,6 +252,13 @@
             [self fireEvent:@"bio:initSession" withObject:@{@"error":[error localizedDescription]}];
         }
     }];
+}
+
+- (void)getAutoInstance:(id)args
+{
+    ENSURE_ARG_COUNT(args, 0);
+    
+    [self initSession:nil];
 }
 
 

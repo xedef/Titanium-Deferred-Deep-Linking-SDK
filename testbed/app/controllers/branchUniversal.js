@@ -124,8 +124,8 @@ $.onInitBranchButtonClicked = function() {
     });
 
     // Branch Universal Object Listeners
+    branchUniversalObjectProxy.addEventListener("bio:generateShortUrl", $.onGenerateUrlFinished);
     if (OS_ANDROID) {
-        branchUniversalObjectProxy.addEventListener("bio:generateShortUrl", $.onGenerateUrlFinished);
         branchUniversalObjectProxy.addEventListener("bio:shareLinkDialogLaunched", $.onShareLinkDialogLaunched);
         branchUniversalObjectProxy.addEventListener("bio:shareLinkDialogDismissed", $.onShareLinkDialogDismissed);
         branchUniversalObjectProxy.addEventListener("bio:shareLinkResponse", $.onShareLinkResponse);
@@ -147,7 +147,6 @@ $.onGenerateUrlButtonClicked = function() {
     Ti.API.info("inside onGenerateUrlButtonClicked");
     branchUniversalObjectProxy.generateShortUrl({
         "feature" : "sample-feature",
-        "alias" : $.aliasTextField.getValue(),
         "channel" : "sample-channel",
         "stage" : "sample-stage",
         "duration" : 1,
@@ -166,7 +165,6 @@ $.onShareSheetButtonClicked = function() {
     Ti.API.info("inside onShareSheetButtonClicked");
     branchUniversalObjectProxy.showShareSheet({
         "feature" : "share-feature",
-        "alias" : $.aliasTextField.getValue(),
         "channel" : "share-channel",
         "stage" : "share-stage",
         "duration" : 1,
