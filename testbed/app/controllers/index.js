@@ -75,10 +75,8 @@ $.initialize = function(params) {
     $.initializeHandlers();
 
     Ti.API.info("start initSession");
-    if (OS_ANDROID) {
-        branch.setDebug(true);
-        branch.getAutoInstance();
-    }
+    branch.setDebug(true);
+    branch.getAutoInstance();
     Ti.App.fireEvent("show_indicator");
 };
 

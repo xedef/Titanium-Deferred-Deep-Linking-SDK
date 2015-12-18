@@ -112,7 +112,7 @@ branch.getAutoSession();
 Same as `initSession`.
 
 **Note:** `Branch.getAutoSession()` must be called prior to calling any other Branch functions.
-**Note:** `Branch.getAutoSession()` is available for `Android` only.
+**Note:** `Branch.getAutoSession()` in iOS is equivalent to `Branch.initSession()` which already has automatic session management. Use `getAutoSession()` to avoid having separate calls for Android and iOS.
 
 ___
 
@@ -293,6 +293,8 @@ branchUniversalObjectProxy.generateShortUrl({
 To implement the callback, you must add a listener to the event `bio:generateShortUrl`.
 The event returns a string object containing the generated link.
 
+**Note:** Avoid passing `alias` in iOS. Adding an `alias` key in the `options` parameter will return a Non-Universal link which will not work in iOS 9.2.
+
 ___
 
 
@@ -353,6 +355,9 @@ To implement the callback, you must add listeners to the following events:
 
 `bio:shareChannelSelected`
 - The event fires a channel is selected.
+
+**Note:** Callbacks in iOS are ignored. There is no need to implement them as the events are handled by `UIActivityViewController`
+**Note:** Avoid passing `alias` in iOS. Adding an `alias` key in the `options` parameter will return a Non-Universal link which will not work in iOS 9.2.
 
 ___
 
