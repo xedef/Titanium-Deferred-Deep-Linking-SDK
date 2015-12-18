@@ -111,8 +111,7 @@ branch.getAutoSession();
 ##### Callback
 Same as `initSession`.
 
-**Note:** `Branch.getAutoSession()` must be called prior to calling any other Branch functions.
-**Note:** `Branch.getAutoSession()` in iOS is equivalent to `Branch.initSession()` which already has automatic session management. Use `getAutoSession()` to avoid having separate calls for Android and iOS.
+**Note:** `Branch.getAutoSession()` must be called prior to calling any other Branch functions. `Branch.getAutoSession()` in iOS is equivalent to `Branch.initSession()` which already has automatic session management. Use `getAutoSession()` to avoid having separate calls for Android and iOS.
 
 ___
 
@@ -356,7 +355,8 @@ To implement the callback, you must add listeners to the following events:
 `bio:shareChannelSelected`
 - The event fires a channel is selected.
 
-**Note:** Callbacks in iOS are ignored. There is no need to implement them as the events are handled by `UIActivityViewController`
+**Note:** Callbacks in iOS are ignored. There is no need to implement them as the events are handled by `UIActivityViewController`.
+
 **Note:** Avoid passing `alias` in iOS. Adding an `alias` key in the `options` parameter will return a Non-Universal link which will not work in iOS 9.2.
 
 ___
