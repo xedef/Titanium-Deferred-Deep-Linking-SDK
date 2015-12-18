@@ -12,38 +12,24 @@
 #import "TiUtils.h"
 
 #import "Branch-SDK/Branch.h"
-#import "JRSwizzle.h"
+
+#import <objc/runtime.h>
 
 @implementation TiApp (Branch)
 
--(BOOL)branchApplication:(UIApplication *)app openURL:(NSURL *)url sourceApplication:(NSString *)source annotation:(id)annotation {
-    NSLog(@"[INFO] swizzling application:openURL");
+bool applicationOpenURLSourceApplication(id self, SEL _cmd, UIApplication* application, NSURL* url, NSString* sourceApplication, id annotation) {
+    NSLog(@"[INFO] applicationOpenURLSourceApplication");
     
-    [TiApp jr_swizzleMethod:@selector(application:openURL:sourceApplication:annotation:) withMethod:@selector(branchApplication:openURL:sourceApplication:annotation:) error:nil];
-    BOOL res = [self branchApplication:app openURL:url sourceApplication:source annotation:annotation];
-    [TiApp jr_swizzleMethod:@selector(application:openURL:sourceApplication:annotation:) withMethod:@selector(branchApplication:openURL:sourceApplication:annotation:) error:nil];
+    // if handleDeepLink returns YES, and you registered a callback in initSessionAndRegisterDeepLinkHandler, the callback will be called with the data associated with the deep link
+    if (![[Branch getInstance] handleDeepLink:url]) {
+        // do other deep link routing for the Facebook SDK, Pinterest SDK, etc
+    }
     
-    BOOL handledByBranch = [[Branch getInstance] handleDeepLink:url];
-    
-    return handledByBranch;
+    return YES;
 }
 
--(BOOL)branchApplication:(UIApplication *)app handleOpenURL:(NSURL *)url {
-    NSLog(@"[INFO] swizzling application:handleOpenURL");
-    
-    [TiApp jr_swizzleMethod:@selector(application:handleOpenURL:) withMethod:@selector(branchApplication:handleOpenURL:) error:nil];
-    BOOL res = [self branchApplication:app handleOpenURL:url];
-    [TiApp jr_swizzleMethod:@selector(application:handleOpenURL:) withMethod:@selector(branchApplication:handleOpenURL:) error:nil];
-    
-    return res;
-}
-
-- (BOOL)branchApplication:(UIApplication *)app continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {
-    NSLog(@"[INFO] swizzling application:continueUserActivity");
-    
-    [TiApp jr_swizzleMethod:@selector(application:continueUserActivity:restorationHandler:) withMethod:@selector(branchApplication:continueUserActivity:restorationHandler:) error:nil];
-    BOOL res = [self branchApplication:app continueUserActivity:userActivity restorationHandler:restorationHandler];
-    [TiApp jr_swizzleMethod:@selector(application:continueUserActivity:restorationHandler:) withMethod:@selector(branchApplication:continueUserActivity:restorationHandler:) error:nil];
+bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* application, NSUserActivity* userActivity, id restorationHandler) {
+    NSLog(@"[INFO] applicationContinueUserActivity");
     
     BOOL handledByBranch = [[Branch getInstance] continueUserActivity:userActivity];
     
@@ -78,38 +64,27 @@
     
 	NSLog(@"[INFO] %@ loaded",self);
     
-    if([[TiApp app] respondsToSelector:@selector(application:openURL:sourceApplication:annotation:)]) {
-        NSError *error = nil;
-        [TiApp jr_swizzleMethod:@selector(application:openURL:sourceApplication:annotation:) withMethod:@selector(branchApplication:openURL:sourceApplication:annotation:) error:&error];
-        if(error) {
-            NSLog(@"[WARN] Cannot swizzle openURL delegate: %@", error);
-        }
-        else {
-            NSLog(@"[INFO] Done swizzling openURL delegate");
-        }
-    }
+    id delegate = [[UIApplication sharedApplication] delegate];
+    Class objectClass = object_getClass(delegate);
     
-    if([[TiApp app] respondsToSelector:@selector(application:continueUserActivity:restorationHandler:)]) {
-        NSError *error = nil;
-        [TiApp jr_swizzleMethod:@selector(application:continueUserActivity:restorationHandler:) withMethod:@selector(branchApplication:continueUserActivity:restorationHandler:) error:&error];
-        if(error) {
-            NSLog(@"[WARN] Cannot swizzle continueUserActivity delegate: %@", error);
-        }
-        else {
-            NSLog(@"[INFO] Done swizzling continueUserActivity delegate");
-        }
-    }
+    NSString *newClassName = [NSString stringWithFormat:@"Custom_%@", NSStringFromClass(objectClass)];
+    Class modDelegate = NSClassFromString(newClassName);
     
-    if([[TiApp app] respondsToSelector:@selector(application:handleOpenURL:)]) {
-        NSError *error = nil;
-        [TiApp jr_swizzleMethod:@selector(application:handleOpenURL:) withMethod:@selector(branchApplication:handleOpenURL:) error:&error];
-        if(error) {
-            NSLog(@"[WARN] Cannot swizzle handleOpenURL delegate: %@", error);
-        }
-        else {
-            NSLog(@"[INFO] Done swizzling handleOpenURL delegate");
-        }
+    if (modDelegate == nil) {
+        modDelegate = objc_allocateClassPair(objectClass, [newClassName UTF8String], 0);
+        
+        SEL selectorToOverride1 = @selector(application:openURL:sourceApplication:annotation:);
+        SEL selectorToOverride3 = @selector(application:continueUserActivity:restorationHandler:);
+        Method m1 = class_getInstanceMethod(objectClass, selectorToOverride1);
+        Method m3 = class_getInstanceMethod(objectClass, selectorToOverride3);
+        
+        class_addMethod(modDelegate, selectorToOverride1, (IMP)applicationOpenURLSourceApplication, method_getTypeEncoding(m1));
+        class_addMethod(modDelegate, selectorToOverride3, (IMP)applicationContinueUserActivity, method_getTypeEncoding(m3));
+        
+        objc_registerClassPair(modDelegate);
     }
+    object_setClass(delegate, modDelegate);
+    
 }
 
 - (void)shutdown:(id)sender

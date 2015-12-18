@@ -165,7 +165,7 @@
     
     [self.branchUniversalObj getShortUrlWithLinkProperties:props andCallback:^(NSString *url, NSError *error) {
         if (!error) {
-            [self fireEvent:@"bio:generateShortUrl" withObject:@{@"generetedLink":url}];
+            [self fireEvent:@"bio:generateShortUrl" withObject:@{@"generatedLink":url}];
         }
         else {
             [self fireEvent:@"bio:generateShortUrl" withObject:@{@"error":[error localizedDescription]}];
