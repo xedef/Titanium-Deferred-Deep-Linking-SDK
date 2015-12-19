@@ -1,7 +1,7 @@
 /**
  * Titanium-Deferred-Deep-Linking-SDK
  *
- * Created by Jestoni Yap
+ * Created by Branch Metrics
  * Copyright (c) 2015 Your Company. All rights reserved.
  */
 

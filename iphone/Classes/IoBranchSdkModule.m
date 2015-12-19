@@ -1,7 +1,7 @@
 /**
  * Titanium-Deferred-Deep-Linking-SDK
  *
- * Created by Jestoni Yap
+ * Created by Branch Metrics
  * Copyright (c) 2015 Your Company. All rights reserved.
  */
 
@@ -19,20 +19,20 @@
 
 bool applicationOpenURLSourceApplication(id self, SEL _cmd, UIApplication* application, NSURL* url, NSString* sourceApplication, id annotation) {
     NSLog(@"[INFO] applicationOpenURLSourceApplication");
-    
+
     // if handleDeepLink returns YES, and you registered a callback in initSessionAndRegisterDeepLinkHandler, the callback will be called with the data associated with the deep link
     if (![[Branch getInstance] handleDeepLink:url]) {
         // do other deep link routing for the Facebook SDK, Pinterest SDK, etc
     }
-    
+
     return YES;
 }
 
 bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* application, NSUserActivity* userActivity, id restorationHandler) {
     NSLog(@"[INFO] applicationContinueUserActivity");
-    
+
     BOOL handledByBranch = [[Branch getInstance] continueUserActivity:userActivity];
-    
+
     return handledByBranch;
 }
 
@@ -61,30 +61,30 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 	// this method is called when the module is first loaded
 	// you *must* call the superclass
 	[super startup];
-    
+
 	NSLog(@"[INFO] %@ loaded",self);
-    
+
     id delegate = [[UIApplication sharedApplication] delegate];
     Class objectClass = object_getClass(delegate);
-    
+
     NSString *newClassName = [NSString stringWithFormat:@"Custom_%@", NSStringFromClass(objectClass)];
     Class modDelegate = NSClassFromString(newClassName);
-    
+
     if (modDelegate == nil) {
         modDelegate = objc_allocateClassPair(objectClass, [newClassName UTF8String], 0);
-        
+
         SEL selectorToOverride1 = @selector(application:openURL:sourceApplication:annotation:);
         SEL selectorToOverride3 = @selector(application:continueUserActivity:restorationHandler:);
         Method m1 = class_getInstanceMethod(objectClass, selectorToOverride1);
         Method m3 = class_getInstanceMethod(objectClass, selectorToOverride3);
-        
+
         class_addMethod(modDelegate, selectorToOverride1, (IMP)applicationOpenURLSourceApplication, method_getTypeEncoding(m1));
         class_addMethod(modDelegate, selectorToOverride3, (IMP)applicationContinueUserActivity, method_getTypeEncoding(m3));
-        
+
         objc_registerClassPair(modDelegate);
     }
     object_setClass(delegate, modDelegate);
-    
+
 }
 
 - (void)shutdown:(id)sender
@@ -161,7 +161,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)initSession:(id)args
 {
     Branch *branch = [self getInstance];
-    
+
     [branch initSessionAndRegisterDeepLinkHandler:^(NSDictionary *params, NSError *error) {
         if (!error) {
             [self fireEvent:@"bio:initSession" withObject:params];
@@ -175,10 +175,10 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)initSessionIsReferrable:(id)args
 {
     ENSURE_SINGLE_ARG(args, NSNumber);
-    
+
     Branch *branch = [self getInstance];
     BOOL isReferrable = [TiUtils boolValue:args];
-    
+
     [branch initSession:isReferrable andRegisterDeepLinkHandler:^(NSDictionary *params, NSError *error) {
         if (!error) {
             [self fireEvent:@"bio:initSession" withObject:params];
@@ -192,11 +192,11 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)initSessionAndAutomaticallyDisplayDeepLinkController:(id)args
 {
     ENSURE_ARG_COUNT(args, 1);
-    
+
     Branch *branch = [self getInstance];
     id arg = [args objectAtIndex:0];
     BOOL automaticallyDisplayController = [TiUtils boolValue:arg];
-    
+
     [branch initSessionWithLaunchOptions:nil automaticallyDisplayDeepLinkController:automaticallyDisplayController deepLinkHandler:^(NSDictionary *params, NSError *error) {
         if (!error) {
             [self fireEvent:@"bio:initSession" withObject:params];
@@ -210,13 +210,13 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)initSessionWithLaunchOptionsAndAutomaticallyDisplayDeepLinkController:(id)args
 {
     ENSURE_SINGLE_ARG(args, KrollCallback);
-    
+
     Branch *branch = [self getInstance];
     NSDictionary *launchOptions = [[TiApp app] launchOptions];
     BOOL display = YES;
-    
+
     KrollCallback *deepLinkHandler = args;
-    
+
     [branch initSessionWithLaunchOptions:launchOptions automaticallyDisplayDeepLinkController:display deepLinkHandler:^(NSDictionary *params, NSError *error) {
         if (!error) {
             [deepLinkHandler call:@[params, NUMBOOL(YES)] thisObject:nil];
@@ -232,7 +232,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)getAutoInstance:(id)args
 {
     ENSURE_ARG_COUNT(args, 0);
-    
+
     [self initSession:nil];
 }
 
@@ -241,20 +241,20 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (NSDictionary *)getLatestReferringParams:(id)args
 {
     ENSURE_ARG_COUNT(args, 0);
-    
+
     Branch *branch = [self getInstance];
     NSDictionary *sessionParams = [branch getLatestReferringParams];
-    
+
     return sessionParams;
 }
 
 - (NSDictionary *)getFirstReferringParams:(id)args
 {
     ENSURE_ARG_COUNT(args, 0);
-    
+
     Branch *branch = [self getInstance];
     NSDictionary *installParams = [branch getFirstReferringParams];
-    
+
     return installParams;
 }
 
@@ -266,12 +266,12 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     Branch *branch = [self getInstance];
     NSString *userId = nil;
     KrollCallback *callback = nil;
-    
+
     // if a callback is passed as an argument
     if ([args count]==2) {
         ENSURE_TYPE([args objectAtIndex:0], NSString);
         userId = [args objectAtIndex:0];
-        
+
         ENSURE_TYPE([args objectAtIndex:1], KrollCallback);
         callback = [args objectAtIndex:1];
     }
@@ -279,7 +279,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
         ENSURE_SINGLE_ARG(args, NSString);
         userId = (NSString *)args;
     }
-    
+
     if (!callback) {
         [branch setIdentity:userId];
     }
@@ -301,10 +301,10 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)registerDeepLinkController:(id)args
 {
     ENSURE_SINGLE_ARG(args, NSString);
-    
+
     UIViewController <BranchDeepLinkingController> *controller = (UIViewController <BranchDeepLinkingController>*)[TiApp app].controller;
     Branch *branch = [self getInstance];
-    
+
     [branch registerDeepLinkController:controller forKey:args];
 }
 
@@ -316,7 +316,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     ENSURE_SINGLE_ARG(args, NSString);
     NSString *arg = [args objectAtIndex:0];
     NSURL *url = [NSURL URLWithString:arg];
-    
+
     Branch *branch = [self getInstance];
     return NUMBOOL([branch handleDeepLink:url]);
 }
@@ -327,7 +327,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (NSString *)getShortURL:(id)args
 {
     ENSURE_ARG_COUNT(args, 0);
-    
+
     Branch *branch = [self getInstance];
     return [branch getShortURL];
 }
@@ -337,12 +337,12 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     Branch *branch = [self getInstance];
     NSDictionary *params = nil;
     KrollCallback *callback = nil;
-    
+
     // if a callback is passed as an argument
     if ([args count]==2) {
         ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
         params = [args objectAtIndex:0];
-        
+
         ENSURE_TYPE([args objectAtIndex:1], KrollCallback);
         callback = [args objectAtIndex:1];
     }
@@ -350,7 +350,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
         ENSURE_SINGLE_ARG(args, NSDictionary);
         params = (NSDictionary *)args;
     }
-    
+
     if (!callback){
         return [branch getShortURLWithParams:params];
     }
@@ -369,7 +369,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (NSString *)getLongURLWithParams:(id)args
 {
     ENSURE_SINGLE_ARG(args, NSDictionary);
-    
+
     id params = [args objectAtIndex:0];
     return [[self getInstance] getLongURLWithParams:params];
 }
@@ -379,12 +379,12 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     ENSURE_ARG_COUNT(args, 2);
     ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
     ENSURE_TYPE([args objectAtIndex:1], NSString);
-    
+
     NSDictionary *params = [args objectAtIndex:0];
     NSString *channel = [args objectAtIndex:1];
-    
+
     Branch *branch = [self getInstance];
-    
+
     return [branch getContentUrlWithParams:params andChannel:channel];
 }
 
@@ -392,12 +392,12 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 {
     ENSURE_SINGLE_ARG(args, NSDictionary);
     ENSURE_UI_THREAD(getBranchActivityItemWithParams, args);
-    
+
     UIActivityItemProvider *provider = [Branch getBranchActivityItemWithParams:args];
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         UIActivityViewController *shareViewController = [[UIActivityViewController alloc] initWithActivityItems:@[ provider ] applicationActivities:nil];
-        
+
         [[TiApp app] showModalController:shareViewController animated:YES];
     });
 }
@@ -408,9 +408,9 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)loadRewards:(id)args
 {
     ENSURE_ARG_COUNT(args, 0);
-    
+
     Branch *branch = [self getInstance];
-    
+
     [branch loadRewardsWithCallback:^(BOOL changed, NSError *error) {
         if(!error) {
             NSNumber *credits = [NSNumber numberWithInteger:[branch getCredits]];
@@ -425,10 +425,10 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)redeemRewards:(id)args
 {
     ENSURE_SINGLE_ARG(args, NSNumber);
-    
+
     NSInteger amount = ((NSNumber *)args).integerValue;
     Branch *branch = [self getInstance];
-    
+
     //[branch redeemRewards:amount];
     [branch redeemRewards:amount callback:^(BOOL changed, NSError *error) {
         if (!error) {
@@ -443,9 +443,9 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)getCreditHistory:(id)args
 {
     ENSURE_ARG_COUNT(args, 0);
-    
+
     Branch *branch = [self getInstance];
-    
+
     [branch getCreditHistoryWithCallback:^(NSArray *list, NSError *error) {
         if (!error) {
             [self fireEvent:@"bio:getCreditHistory" withObject:list];
@@ -462,7 +462,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 - (void)logout:(id)args
 {
     ENSURE_ARG_COUNT(args, 0);
-    
+
     Branch *branch = [self getInstance];
     [branch logout];
 }
@@ -478,7 +478,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     if ([args count]==2) {
         ENSURE_TYPE([args objectAtIndex:0], NSString);
         name = [args objectAtIndex:0];
-        
+
         ENSURE_TYPE([args objectAtIndex:1], NSDictionary);
         state = [args objectAtIndex:1];
     }
@@ -486,9 +486,9 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
         ENSURE_SINGLE_ARG(args, NSString);
         name = (NSString *)args;
     }
-    
+
     Branch *branch = [self getInstance];
-    
+
     if (state) {
         [branch userCompletedAction:name withState:state];
     }
@@ -505,17 +505,17 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     ENSURE_ARG_COUNT(args, 2);
     ENSURE_TYPE([args objectAtIndex:0], NSString);
     ENSURE_TYPE([args objectAtIndex:1], NSDictionary);
-    
+
     NSString *activityType = (NSString *)[args objectAtIndex:0];
     NSDictionary *userInfo = (NSDictionary*)[args objectAtIndex:1];
-        
+
     NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:activityType];
     [userActivity setUserInfo:userInfo];
-    
+
     Branch *branch = [self getInstance];
-    
+
     NSLog(@"[INFO] module continueUserActivity");
-    
+
     [branch continueUserActivity:userActivity];
 }
 
