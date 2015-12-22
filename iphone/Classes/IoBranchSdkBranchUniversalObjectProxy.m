@@ -2,8 +2,6 @@
 //  IoBranchSdkBranchUniversalObjectProxy.m
 //  Titanium-Deferred-Deep-Linking-SDK
 //
-//  Created by Kevin Milo on 26/11/2015.
-//
 //
 
 #import "IoBranchSdkBranchUniversalObjectProxy.h"
@@ -27,9 +25,9 @@
     // proxy is created without arguments then this initializer will be called.
     // This method is also called from the other _initWithPageContext method.
     // The superclass method calls the init and _configure methods.
-    
+
     NSLog(@"_initWithPageContext (no arguments)");
-    
+
     return [super _initWithPageContext:context];
 }
 
@@ -39,9 +37,9 @@
     // proxy is created with arguments then this initializer will be called.
     // The superclass method calls the _initWithPageContext method without
     // arguments.
-    
+
     NSLog(@"_initWithPageContext %@", args);
-    
+
     return [super _initWithPageContext:context_ args:args];
 }
 
@@ -50,9 +48,9 @@
     // This method is called from _initWithPageContext to allow for
     // custom configuration of the module before startup. The superclass
     // method calls the startup method.
-    
+
     NSLog(@"_configure");
-    
+
     [super _configure];
 }
 
@@ -63,17 +61,17 @@
     // and is a good point to process arguments that have been passed to the
     // proxy create method since most of the initialization has been completed
     // at this point.
-    
+
     NSLog(@"_initWithProperties %@", properties);
-    
+
     [super _initWithProperties:properties];
-    
+
     self.branchUniversalObj = [[BranchUniversalObject alloc] init];
-    
+
     for (id key in properties) {
         if ([key isEqualToString:@"contentMetadata"]){
             NSDictionary *metadata = (NSDictionary *)[properties valueForKey:key];
-            
+
             for (id key_ in metadata) {
                 [self.branchUniversalObj addMetadataKey:key_ value:[metadata valueForKey:key_]];
             }
@@ -82,7 +80,7 @@
             NSString *indexingMode = [properties valueForKey:key];
             if ([indexingMode isEqualToString:@"private"]) {
                 self.branchUniversalObj.contentIndexMode = ContentIndexModePrivate;
-                
+
             }
             else if ([indexingMode isEqualToString:@"public"]){
                 self.branchUniversalObj.contentIndexMode = ContentIndexModePublic;
@@ -96,7 +94,7 @@
             [self.branchUniversalObj setValue:[properties objectForKey:key] forKey:key];
         }
     }
-    
+
 }
 
 - (id)initWithCanonicalIdentifier:(id)args
@@ -108,7 +106,7 @@
     else {
         self.branchUniversalObj.canonicalIdentifier = args;
     }
-    
+
     return self;
 }
 
@@ -144,12 +142,12 @@
     ENSURE_ARG_COUNT(args, 2);
     ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
     ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
-    
+
     NSDictionary *arg1 = [args objectAtIndex:0];
     NSDictionary *arg2 = [args objectAtIndex:1];
-    
+
     BranchLinkProperties *props = [[BranchLinkProperties alloc] init];
-    
+
     for (id key in arg1) {
         if ([key isEqualToString:@"duration"]) {
             props.matchDuration = (NSUInteger)[((NSNumber *)[arg1 objectForKey:key]) integerValue];
@@ -158,11 +156,11 @@
             [props setValue:[arg1 objectForKey:key] forKey:key];
         }
     }
-    
+
     for (id key in arg2) {
         [props addControlParam:key withValue:[arg1 objectForKey:key]];
     }
-    
+
     [self.branchUniversalObj getShortUrlWithLinkProperties:props andCallback:^(NSString *url, NSError *error) {
         if (!error) {
             [self fireEvent:@"bio:generateShortUrl" withObject:@{@"generatedLink":url}];
@@ -176,7 +174,7 @@
 - (void)showShareSheet:(id)args
 {
     NSString *shareText = nil;
-    
+
     if ([args count]==2) {
         ENSURE_ARG_COUNT(args, 2);
         ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
@@ -187,15 +185,15 @@
         ENSURE_TYPE([args objectAtIndex:0], NSDictionary);
         ENSURE_TYPE([args objectAtIndex:1], NSDictionary);
         ENSURE_TYPE([args objectAtIndex:2], NSString);
-        
+
         shareText = [args objectAtIndex:2];
     }
-    
+
     NSDictionary *arg1 = [args objectAtIndex:0];
     NSDictionary *arg2 = [args objectAtIndex:1];
-    
+
     BranchLinkProperties *linkProperties = [[BranchLinkProperties alloc] init];
-    
+
     for (id key in arg1) {
         if ([key isEqualToString:@"duration"]) {
             linkProperties.matchDuration = (NSUInteger)[((NSNumber *)[arg1 objectForKey:key]) integerValue];
@@ -204,20 +202,20 @@
             [linkProperties setValue:[arg1 objectForKey:key] forKey:key];
         }
     }
-    
+
     for (id key in arg2) {
         [linkProperties addControlParam:key withValue:[arg1 objectForKey:key]];
     }
-    
+
     UIActivityItemProvider *itemProvider = [self.branchUniversalObj getBranchActivityItemWithLinkProperties:linkProperties];
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         NSMutableArray *items = [NSMutableArray arrayWithObject:itemProvider];
         if (shareText) {
             [items addObject:shareText];
         }
         UIActivityViewController *shareViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
-        
+
         if (linkProperties.controlParams[@"$email_subject"]) {
             @try {
                 [shareViewController setValue:linkProperties.controlParams[@"$email_subject"] forKey:@"subject"];
@@ -226,7 +224,7 @@
                 NSLog(@"[Branch warning] Unable to setValue 'emailSubject' forKey 'subject' on UIActivityViewController.");
             }
         }
-        
+
         [[TiApp app] showModalController:shareViewController animated:YES];
     });
 }

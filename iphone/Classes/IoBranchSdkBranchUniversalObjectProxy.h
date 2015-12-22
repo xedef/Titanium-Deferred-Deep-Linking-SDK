@@ -2,8 +2,6 @@
 //  IoBranchSdkBranchUniversalObjectProxy.h
 //  Titanium-Deferred-Deep-Linking-SDK
 //
-//  Created by Kevin Milo on 26/11/2015.
-//
 //
 
 #import "TiProxy.h"
