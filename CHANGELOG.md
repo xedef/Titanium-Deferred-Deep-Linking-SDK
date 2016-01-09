@@ -2,8 +2,10 @@
 All notable changes to the Branch Web SDK will be documented here.
 The Branch Web SDK adheres to [Semantic Versioning](http://semver.org/).
 
-## [VERSION] - unreleased
-- Splits out the Titanium SDK from the Web SDK repo
+## [v2.0] - 2015-12-23
+- Deprecated and scrapped old Titanium SDK. Made a lightweight wrapper around our core iOS/Android SDKs
+- Added support for Universal Links
+- Added support for Branch Universal Object and content analytics
 
 ## [v1.6.4] - 2015-07-21
 - Adds Code creating, applying, validating to web testbed
