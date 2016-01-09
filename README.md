@@ -74,7 +74,7 @@ After you register your app, your Branch key can be retrieved on the Settings pa
 
 Edit your manifest file to have the following items:
 
-```js
+```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.branch.sample"
     android:versionCode="1"
@@ -142,35 +142,6 @@ In iOS 9.2, Apple dropped support for URI scheme redirects. You must enable Univ
 </plist>
 ```
 
-___
-
-
-## Android: Add your Branch key to the manifest
-
-After you register your app, your Branch key can be retrieved on the Settings page of the dashboard. Add it
-(them, if you want to do it for both your live and test apps) to your project's manifest file as a meta data.
-
-Edit your manifest file to have the following items:
-
-```xml
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.branch.sample"
-    android:versionCode="1"
-    android:versionName="1.0" >
-
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <application>
-        <!-- Other existing entries -->
-
-        <!-- Add this meta-data below, and change "key_live_xxxxxxx" to your actual live Branch key -->
-        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_xxxxxxx" />
-
-        <!-- For your test app, if you have one; Again, use your actual test Branch key -->
-        <meta-data android:name="io.branch.sdk.BranchKey.test" android:value="key_test_yyyyyyy" />
-    </application>
-</manifest>
-```
 
 ___
 
@@ -205,10 +176,15 @@ ___
 Setting the SDK debug flag will generate a new device ID each time the app is installed
 instead of possibly using the same device id.  This is useful when testing.
 
+##### Usage
+
+```js
+branch.setDebug(true);
+```
+
 This needs to be set before the Branch.init call!!!
 
 ___
-
 
 
 ### initSession()
