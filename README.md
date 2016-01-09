@@ -367,7 +367,7 @@ As more methods have evolved in iOS, we've found that it was increasingly hard t
 
 ##### Usage
 ```js
-branchUniversalObjectProxy.createBranchUniversalObject({
+var branchUniversalObject = branch.createBranchUniversalObject({
   "canonicalIdentifier" : "sample-id",
   "title" : "Sample",
   "contentDescription" : "This is a sample",
@@ -390,7 +390,7 @@ If you want to track how many times a user views a particular piece of content, 
 
 ##### Usage
 ```js
-branchUniversalObjectProxy.registerView();
+branchUniversalObject.registerView();
 ```
 
 ___
@@ -428,7 +428,7 @@ Once you've created your `Branch Universal Object`, which is the reference to th
 
 ##### Usage
 ```js
-branchUniversalObjectProxy.generateShortUrl({
+branchUniversalObject.generateShortUrl({
   "feature" : "sample-feature",
   "alias" : "sample-alias",
   "channel" : "sample-channel",
@@ -486,7 +486,7 @@ The Branch iOS SDK includes a wrapper on the UIActivityViewController, that will
 
 ##### Usage
 ```js
-branchUniversalObjectProxy.showShareSheet({
+branchUniversalObject.showShareSheet({
   "feature" : "sample-feature",
   "alias" : "sample-alias",
   "channel" : "sample-channel",
