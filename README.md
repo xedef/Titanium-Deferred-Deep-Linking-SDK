@@ -178,23 +178,23 @@ ___
 
 1. Branch Session
   + [.initSession()](#initsession)
-  + [.getAutoSession()](#getAutoSession)
+  + [.getAutoSession()](#getautosession)
   + [.getLatestReferringParams()](#getlatestreferringparams)
-  + [.getFirstReferringParams()](#getFirstReferringParams)
-  + [.setIdentity(identity)](#setIdentity-identity)
+  + [.getFirstReferringParams()](#getfirstreferringparams)
+  + [.setIdentity(identity)](#setidentity-identity)
   + [.logout()](#logout)
-  + [.userCompletedAction()](#userCompletedAction)
+  + [.userCompletedAction()](#usercompletedaction)
 
 2. Branch Universal Object
-  + [.createBranchUniversalObject(options)](#createBranchUniversalObject-options)
-  + [.registerView()](#registerView)
-  + [.generateShortUrl(options, controlParameters)](#generateShortUrl-linkProperties-controlParameters)
-  + [.showShareSheet(options, controlParameters)](#showShareSheet-linkProperties-controlParameters)
+  + [.createBranchUniversalObject(options)](#createbranchuniversalobject-options)
+  + [.registerView()](#registerview)
+  + [.generateShortUrl(options, controlParameters)](#generateshorturl-linkproperties-controlparameters)
+  + [.showShareSheet(options, controlParameters)](#showsharesheet-linkproperties-controlparameters)
 
 3. Referral System Rewarding
-  + [.loadRewards()](#loadRewards)
-  + [.redeemRewards(value)](#redeemRewards-value)
-  + [.creditHistory()](#creditHistor)
+  + [.loadRewards()](#loadrewards)
+  + [.redeemRewards(value)](#redeemrewards-value)
+  + [.creditHistory()](#credithistory)
 
 ___
 
