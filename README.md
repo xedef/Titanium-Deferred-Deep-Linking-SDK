@@ -181,20 +181,20 @@ ___
   + [.getAutoSession()](#getautosession)
   + [.getLatestReferringParams()](#getlatestreferringparams)
   + [.getFirstReferringParams()](#getfirstreferringparams)
-  + [.setIdentity(identity)](#setidentity-identity)
+  + [.setIdentity(identity)](#setidentityidentity)
   + [.logout()](#logout)
   + [.userCompletedAction()](#usercompletedaction)
 
 2. Branch Universal Object
-  + [.createBranchUniversalObject(options)](#createbranchuniversalobject-options)
+  + [.createBranchUniversalObject(options)](#createbranchuniversalobjectoptions)
   + [.registerView()](#registerview)
-  + [.generateShortUrl(options, controlParameters)](#generateshorturl-linkproperties-controlparameters)
-  + [.showShareSheet(options, controlParameters)](#showsharesheet-linkproperties-controlparameters)
+  + [.generateShortUrl(options, controlParameters)](#generateshorturloptions-controlparameters)
+  + [.showShareSheet(options, controlParameters)](#showsharesheetoptions-controlparameters)
 
 3. Referral System Rewarding
   + [.loadRewards()](#loadrewards)
   + [.redeemRewards(value)](#redeemrewards-value)
-  + [.creditHistory()](#credithistory)
+  + [.creditHistory()](#get-credit-history)
 
 ___
 
