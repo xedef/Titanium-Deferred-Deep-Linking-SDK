@@ -432,8 +432,7 @@ branchUniversalObject.generateShortUrl({
   "feature" : "sample-feature",
   "alias" : "sample-alias",
   "channel" : "sample-channel",
-  "stage" : "sample-stage",
-  "duration" : 1,
+  "stage" : "sample-stage"
 }, {
   "$desktop_url" : "http://desktop-url.com",
 });
