@@ -96,8 +96,11 @@ Edit your manifest file to have the following items:
 
 ### iOS: Register a URI Scheme and add your Branch key
 
-In your project's `tiapp.xml` file, you can register your app to respond to direct deep links (`yourapp://` in a mobile browser) by adding `CFBundleURLTypes` block. Also, make sure to change `yourapp` to a unique string that represents your app name. 
+In your project's `tiapp.xml` file:
+
+1. You can register your app to respond to direct deep links (`yourapp://` in a mobile browser) by adding `CFBundleURLTypes` block. Also, make sure to change `yourapp` to a unique string that represents your app name. 
 In https://dashboard.branch.io/#/settings/link, tick `I have an iOS App` checkbox and enter your URI Scheme (e.g.: `yourapp://`) into the text box.
+2. Add your `Branch key` found on the settings page here https://dashboard.branch.io/#/settings
 
 ```xml
   <ios>
