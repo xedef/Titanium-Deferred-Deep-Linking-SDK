@@ -7,6 +7,7 @@ Exhaustive documentation can be found on our [documentation portal](https://dev.
 This is a repository of our open source Branch SDK for Titanium, and the information presented here serves as a reference
 manual for our Titanium modules. See the table of contents below for a complete list of the content featured in this
 document.
+
 _____
 
 ## Demo App
