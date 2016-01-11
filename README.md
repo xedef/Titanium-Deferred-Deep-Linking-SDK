@@ -98,7 +98,7 @@ Edit your manifest file to have the following items:
 
 In your project's `tiapp.xml` file:
 
-1. You can register your app to respond to direct deep links (`yourapp://` in a mobile browser) by adding `CFBundleURLTypes` block. Also, make sure to change `yourapp` to a unique string that represents your app name. 
+1. You can register your app to respond to direct deep links (`yourapp://` in a mobile browser) by adding `CFBundleURLTypes` block. Also, make sure to change `yourapp` to a unique string that represents your app name.
 In https://dashboard.branch.io/#/settings/link, tick `I have an iOS App` checkbox and enter your URI Scheme (e.g.: `yourapp://`) into the text box.
 2. Add your `Branch key` found on the settings page here https://dashboard.branch.io/#/settings
 
@@ -128,8 +128,8 @@ In https://dashboard.branch.io/#/settings/link, tick `I have an iOS App` checkbo
 
 In iOS 9.2, Apple dropped support for URI scheme redirects. You must enable Universal Links if you want Branch-generated links to work in your iOS app. To do this:
 
-1. enable `Associated Domains` capability on the Apple Developer portal when you create your app's bundle identifier. 
-2. In https://dashboard.branch.io/#/settings/link, tick the `Enable Universal Links` checkbox and provide the Bundle Identifier and Apple Team ID in the appropriate boxes. 
+1. enable `Associated Domains` capability on the Apple Developer portal when you create your app's bundle identifier.
+2. In https://dashboard.branch.io/#/settings/link, tick the `Enable Universal Links` checkbox and provide the Bundle Identifier and Apple Team ID in the appropriate boxes.
 3. Finally, create a new file named `Entitlements.plist` in the same directory as your Titanium app's `tiapp.xml` with the `associated-domains` key like below. You may add more entitlement keys if you have any.
 
 ```xml
@@ -152,7 +152,6 @@ ___
 
 1. Branch Session
   + [.initSession()](#initsession)
-  + [.getAutoSession()](#getautosession)
   + [.getLatestReferringParams()](#getlatestreferringparams)
   + [.getFirstReferringParams()](#getfirstreferringparams)
   + [.setIdentity(identity)](#setidentityidentity)
@@ -226,24 +225,6 @@ Branch returns explicit parameters every time. Here is a list, and a description
 
 
 **Note:** `Branch.initSession()` must be called prior to calling any other Branch functions.
-
-___
-
-
-
-### getAutoSession()
-
-Initializes the branch instance with automatic session management. Implements same callback as of `initSession`.
-
-##### Usage
-```js
-branch.getAutoSession();
-```
-
-##### Callback
-Same as `initSession`.
-
-**Note:** `Branch.getAutoSession()` must be called prior to calling any other Branch functions. `Branch.getAutoSession()` in iOS is equivalent to `Branch.initSession()` which already has automatic session management. Use `getAutoSession()` to avoid having separate calls for Android and iOS.
 
 ___
 

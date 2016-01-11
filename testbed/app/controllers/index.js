@@ -1,5 +1,5 @@
 var branch = require('io.branch.sdk');
-branch.setDebug();
+
 
 /*
  ************************************************
@@ -75,8 +75,8 @@ $.initialize = function(params) {
     $.initializeHandlers();
 
     Ti.API.info("start initSession");
-    branch.setDebug(true);
-    branch.getAutoInstance();
+    branch.setDebug();
+    branch.initSession();
     Ti.App.fireEvent("show_indicator");
 };
 
@@ -94,10 +94,8 @@ $.initializeHandlers = function() {
         Ti.Android.currentActivity.addEventListener("newintent", function(e) {
             Ti.API.info("inside newintent: " + e);
             $.window.open();
-            branch.setDebug(true);
-            branch.getAutoInstance();
+            branch.initSession();
             Ti.App.fireEvent("show_indicator");
-
         });
     }
 
