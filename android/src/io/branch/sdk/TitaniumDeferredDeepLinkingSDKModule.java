@@ -190,45 +190,8 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 		KrollDict sessionDict = new KrollDict();
 		Log.d(LCAT, "data: ");
 		Log.d(LCAT, data.toString());
-		if (data.has("session_id")) {
-			sessionDict.put("session_id", data.optString("session_id"));
-		}
-		if (data.has("~channel")) {
-			sessionDict.put("~channel", data.optString("~channel"));
-		}
-    	if (data.has("~feature")) {
-			sessionDict.put("~feature", data.optString("~feature"));
-		}
-		if (data.has("~tags")) {
-			sessionDict.put("~tags", data.optString("~tags"));
-		}
-		if (data.has("~campaign")) {
-			sessionDict.put("~campaign", data.optString("~campaign"));
-		}
-		if (data.has("~stage")) {
-			sessionDict.put("~stage", data.optString("~stage"));
-		}
-		if (data.has("~creation_source")) {
-			sessionDict.put("~creation_source", data.optString("~creation_source"));
-		}
-		if (data.has("+match_guaranteed")) {
-			sessionDict.put("+match_guaranteed", data.optBoolean("+match_guaranteed"));
-		}
-		if (data.has("+referrer")) {
-			sessionDict.put("+referrer", data.optString("+referrer"));
-		}
-		if (data.has("+phone_number")) {
-			sessionDict.put("+phone_number", data.optString("+phone_number"));
-		}
-		if (data.has("+is_first_session")) {
-			sessionDict.put("+is_first_session", data.optBoolean("+is_first_session"));
-		}
-		if (data.has("+clicked_branch_link")) {
-			sessionDict.put("+clicked_branch_link", data.optBoolean("+clicked_branch_link"));
-		}
-		if (data.has("+click_timestamp")) {
-			sessionDict.put("+click_timestamp", data.optBoolean("+click_timestamp"));
-		}
+
+		sessionDict = parseJSONObject(data);
     	return sessionDict;
 	}
 
@@ -240,6 +203,7 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 		while(keys.hasNext()) {
 		    String key = (String)keys.next();
 		    Log.d(LCAT, "processing key: " + key);
+		    Log.d(LCAT, "key instance: " + jsonObject.opt(key).getClass().getName());
 		    if (jsonObject.opt(key) instanceof JSONObject) {
 		    	Log.d(LCAT, "recursing...");
 		    	JSONObject jsonObj;
@@ -252,13 +216,48 @@ public class TitaniumDeferredDeepLinkingSDKModule extends KrollModule
 				catch (JSONException exception) {
 					Log.d(LCAT, "invalid json passed");
 				}
-    		} else {
+    		} else if (jsonObject.opt(key) instanceof JSONArray) {
+    			Log.d(LCAT, "processing jsonarray...");
+    			try {
+					String[] stringArray = parseJSONArray(jsonObject.getJSONArray(key));
+			    	dict.put(key, stringArray);
+				}
+				catch (JSONException exception) {
+					Log.d(LCAT, "invalid jsonarray passed");
+				}
+    		} else if (jsonObject.opt(key) == JSONObject.NULL) {
+				Log.d(LCAT, "null object");
+				dict.put(key, null);
+			} else {
     			Log.d(LCAT, "not recursing...");
     			dict.put(key, jsonObject.opt(key));
     		}
 		}
 
 		return dict;
+	}
+
+	private String[] parseJSONArray(JSONArray jsonArray) {
+		Log.d(LCAT, "start parseJSONArray");
+		ArrayList<Object> list = new ArrayList<Object>();
+		if (jsonArray != null) {
+			for (int i = 0; i < jsonArray.length(); i++) {
+				try {
+					Object value = jsonArray.get(i);
+					if (value == JSONObject.NULL) {
+						Log.d(LCAT, "null object");
+						value = null;
+					}
+					list.add(value);
+				} catch (JSONException exception) {
+					Log.d(LCAT, "invalid object");
+				}
+			}
+		}
+
+		String[] stringArray = list.toArray(new String[list.size()]);
+
+		return stringArray;
 	}
 
 	//----------- Inner Classes: Listeners ----------//
