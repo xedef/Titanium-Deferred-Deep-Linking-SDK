@@ -75,11 +75,29 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 		}
 	}
 
-
 	// Constructor
 	public BranchUniversalObjectProxy()
 	{
 		super();
+	}
+
+	// Test methods
+	@Kroll.method
+	public void printMessage(String message)
+	{
+		Log.d(LCAT, "printing message: " + message);
+	}
+
+	@Kroll.getProperty @Kroll.method
+	public String getMessage()
+	{
+        return "Hello World from my module";
+	}
+
+	@Kroll.setProperty @Kroll.method
+	public void setMessage(String message)
+	{
+	    Log.d(LCAT, "Tried setting module message to: " + message);
 	}
 
 	@Override

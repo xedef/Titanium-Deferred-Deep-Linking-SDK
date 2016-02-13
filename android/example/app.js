@@ -1,7 +1,5 @@
-// This is a test harness for your module
-// You should do something interesting in this harness
-// to test out the module and to provide instructions
-// to users on how to use it by example.
+// This is a simple test harness for the module to verify that it is working
+// More information about the implementation can be found on README.md
 
 
 // open a single window
@@ -22,7 +20,7 @@ Ti.API.info("module exampleProp is => " + titanium_deferred_deep_linking_sdk.exa
 titanium_deferred_deep_linking_sdk.exampleProp = "This is a test value";
 
 if (Ti.Platform.name == "android") {
-	var proxy = titanium_deferred_deep_linking_sdk.createExample({
+	var proxy = titanium_deferred_deep_linking_sdk.createBranchUniversalObject({
 		message: "Creating an example Proxy",
 		backgroundColor: "red",
 		width: 100,
