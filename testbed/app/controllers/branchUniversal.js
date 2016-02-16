@@ -170,6 +170,8 @@ $.onShareSheetButtonClicked = function() {
         "duration" : 1,
     }, {
         "$desktop_url" : "http://desktop_url.com",
+        "$email_subject" : "This is a sample subject",
+        "$email_body" : "This is a sample body",
     });
 }
 

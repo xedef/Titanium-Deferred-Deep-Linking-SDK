@@ -204,16 +204,22 @@
     }
 
     for (id key in arg2) {
-        [linkProperties addControlParam:key withValue:[arg1 objectForKey:key]];
+        [linkProperties addControlParam:key withValue:[arg2 objectForKey:key]];
     }
 
     UIActivityItemProvider *itemProvider = [self.branchUniversalObj getBranchActivityItemWithLinkProperties:linkProperties];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         NSMutableArray *items = [NSMutableArray arrayWithObject:itemProvider];
+
         if (shareText) {
             [items addObject:shareText];
         }
+
+        if (linkProperties.controlParams[@"$email_body"]) {
+            [items addObject:linkProperties.controlParams[@"$email_body"]];
+        }
+
         UIActivityViewController *shareViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
 
         if (linkProperties.controlParams[@"$email_subject"]) {

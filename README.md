@@ -409,7 +409,7 @@ ___
 
 
 
-### showShareSheet(options, controlParameters)
+### showShareSheet(options, controlParameters, contentParams)
 
 UIActivityView is the standard way of allowing users to share content from your app. Once you've created your `Branch Universal Object`, which is the reference to the content you're interested in, you can then automatically share it _without having to create a link_ using the mechanism below..
 
@@ -443,6 +443,8 @@ The Branch iOS SDK includes a wrapper on the UIActivityViewController, that will
 | $fire_url | `string` | The URL for Kindle Fire
 | $blackberry_url | `string` | The URL for Blackberry
 | $windows_phone_url | `string` | The URL for Windows phone
+| $email_subject | `string` | Title string used on sharing options
+| $email_body | `string` | Body string used on sharing options
 
 ##### Usage
 ```js
@@ -454,6 +456,8 @@ branchUniversalObject.showShareSheet({
   "duration" : 1,
 }, {
   "$desktop_url" : "http://desktop-url.com",
+  "$email_subject" : "This is a sample subject",
+  "$email_body" : "This is a sample body",
 });
 ```
 
