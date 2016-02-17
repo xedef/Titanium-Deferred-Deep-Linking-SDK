@@ -243,17 +243,15 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 		String subject = "";
 		String body = "";
 
-		if (contentParams.controlParams("$email_subject")) {
-			Log.d(LCAT, "showShareSheet subject");
-			subject = controlParams.getString("subject");
+		if (controlParams.containsKey("$email_subject")) {
+			subject = controlParams.getString("$email_subject");
 		}
 
-		if (contentParams.contcontrolParamsainsKey("$email_body")) {
-			Log.d(LCAT, "showShareSheet body");
-			body = controlParams.getString("body");
+		if (controlParams.containsKey("$email_body")) {
+			body = controlParams.getString("$email_body");
 		}
 
-		ShareSheetStyle shareSheetStyle = new ShareSheetStyle(activity, body, subject)
+		ShareSheetStyle shareSheetStyle = new ShareSheetStyle(activity, subject, body)
                 .setCopyUrlStyle(activity.getResources().getDrawable(android.R.drawable.ic_menu_send), "Copy", "Added to clipboard")
                 .setMoreOptionStyle(activity.getResources().getDrawable(android.R.drawable.ic_menu_search), "Show more")
                 .addPreferredSharingOption(SharingHelper.SHARE_WITH.FACEBOOK)
