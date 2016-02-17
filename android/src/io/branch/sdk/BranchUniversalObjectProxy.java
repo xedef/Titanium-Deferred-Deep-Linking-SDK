@@ -240,10 +240,22 @@ public class BranchUniversalObjectProxy extends TiViewProxy
 		Log.d(LCAT, "start showShareSheet");
 		final Activity activity = this.getActivity();
 
-		ShareSheetStyle shareSheetStyle = new ShareSheetStyle(activity, "Check this out!", "This stuff is awesome: ")
+		String subject = "";
+		String body = "";
+
+		if (controlParams.containsKey("$email_subject")) {
+			subject = controlParams.getString("$email_subject");
+		}
+
+		if (controlParams.containsKey("$email_body")) {
+			body = controlParams.getString("$email_body");
+		}
+
+		ShareSheetStyle shareSheetStyle = new ShareSheetStyle(activity, subject, body)
                 .setCopyUrlStyle(activity.getResources().getDrawable(android.R.drawable.ic_menu_send), "Copy", "Added to clipboard")
                 .setMoreOptionStyle(activity.getResources().getDrawable(android.R.drawable.ic_menu_search), "Show more")
                 .addPreferredSharingOption(SharingHelper.SHARE_WITH.FACEBOOK)
+                .addPreferredSharingOption(SharingHelper.SHARE_WITH.TWITTER)
                 .addPreferredSharingOption(SharingHelper.SHARE_WITH.EMAIL);
 
         LinkProperties linkProperties = createLinkPropertiesDict(options, controlParams);
