@@ -391,7 +391,6 @@ Once you've created your `Branch Universal Object`, which is the reference to th
 ```js
 branchUniversalObject.generateShortUrl({
   "feature" : "sample-feature",
-  "alias" : "sample-alias",
   "channel" : "sample-channel",
   "stage" : "sample-stage"
 }, {
@@ -450,7 +449,6 @@ The Branch iOS SDK includes a wrapper on the UIActivityViewController, that will
 ```js
 branchUniversalObject.showShareSheet({
   "feature" : "sample-feature",
-  "alias" : "sample-alias",
   "channel" : "sample-channel",
   "stage" : "sample-stage",
   "duration" : 1,
