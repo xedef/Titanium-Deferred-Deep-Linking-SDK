@@ -62,7 +62,7 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 	// you *must* call the superclass
 	[super startup];
 
-	NSLog(@"[INFO] %@ loaded",self);
+	NSLog(@"[INFO] %@ loaded", self);
 
     id delegate = [[UIApplication sharedApplication] delegate];
     Class objectClass = object_getClass(delegate);
@@ -74,17 +74,17 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
         modDelegate = objc_allocateClassPair(objectClass, [newClassName UTF8String], 0);
 
         SEL selectorToOverride1 = @selector(application:openURL:sourceApplication:annotation:);
-        SEL selectorToOverride3 = @selector(application:continueUserActivity:restorationHandler:);
+        SEL selectorToOverride2 = @selector(application:continueUserActivity:restorationHandler:);
+
         Method m1 = class_getInstanceMethod(objectClass, selectorToOverride1);
-        Method m3 = class_getInstanceMethod(objectClass, selectorToOverride3);
+        Method m2 = class_getInstanceMethod(objectClass, selectorToOverride2);
 
         class_addMethod(modDelegate, selectorToOverride1, (IMP)applicationOpenURLSourceApplication, method_getTypeEncoding(m1));
-        class_addMethod(modDelegate, selectorToOverride3, (IMP)applicationContinueUserActivity, method_getTypeEncoding(m3));
+        class_addMethod(modDelegate, selectorToOverride2, (IMP)applicationContinueUserActivity, method_getTypeEncoding(m2));
 
         objc_registerClassPair(modDelegate);
     }
     object_setClass(delegate, modDelegate);
-
 }
 
 - (void)shutdown:(id)sender
@@ -181,7 +181,9 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 {
     Branch *branch = [self getInstance];
 
-    [branch initSessionAndRegisterDeepLinkHandler:^(NSDictionary *params, NSError *error) {
+    NSDictionary *launchOptions = [[TiApp app] launchOptions];
+
+    [branch initSessionWithLaunchOptions:launchOptions andRegisterDeepLinkHandler:^(NSDictionary *params, NSError *error) {
         if (!error) {
             [self fireEvent:@"bio:initSession" withObject:params];
         }
@@ -198,7 +200,9 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     Branch *branch = [self getInstance];
     BOOL isReferrable = [TiUtils boolValue:args];
 
-    [branch initSession:isReferrable andRegisterDeepLinkHandler:^(NSDictionary *params, NSError *error) {
+    NSDictionary *launchOptions = [[TiApp app] launchOptions];
+
+    [branch initSessionWithLaunchOptions:launchOptions isReferrable:isReferrable andRegisterDeepLinkHandler:^(NSDictionary *params, NSError *error) {
         if (!error) {
             [self fireEvent:@"bio:initSession" withObject:params];
         }
@@ -521,19 +525,22 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 
 - (void)continueUserActivity:(id)args
 {
-    ENSURE_ARG_COUNT(args, 2);
+    NSLog(@"[INFO] module continueUserActivity - %@", args);
+
+    ENSURE_ARG_COUNT(args, 3);
     ENSURE_TYPE([args objectAtIndex:0], NSString);
-    ENSURE_TYPE([args objectAtIndex:1], NSDictionary);
+    ENSURE_TYPE([args objectAtIndex:1], NSString);
+    ENSURE_TYPE([args objectAtIndex:2], NSDictionary);
 
     NSString *activityType = (NSString *)[args objectAtIndex:0];
-    NSDictionary *userInfo = (NSDictionary*)[args objectAtIndex:1];
+    NSURL *webpageURL = [NSURL URLWithString:(NSString *)[args objectAtIndex:1]];
+    NSDictionary *userInfo = (NSDictionary*)[args objectAtIndex:2];
 
     NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:activityType];
+    [userActivity setWebpageURL:webpageURL];
     [userActivity setUserInfo:userInfo];
 
     Branch *branch = [self getInstance];
-
-    NSLog(@"[INFO] module continueUserActivity");
 
     [branch continueUserActivity:userActivity];
 }

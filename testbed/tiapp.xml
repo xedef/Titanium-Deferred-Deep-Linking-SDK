@@ -36,6 +36,11 @@
         <false/>
         <key>UIStatusBarStyle</key>
         <string>UIStatusBarStyleDefault</string>
+        <!-- Custom activity -->
+        <key>NSUserActivityTypes</key>
+        <array>
+          <string>io.branch.testbed.universalLink</string>
+        </array>
         <!-- Add branch key as key-value pair -->
         <key>branch_key</key>
         <string>key_live_xxxxxxx</string>

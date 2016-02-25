@@ -1,6 +1,5 @@
 var branch = require('io.branch.sdk');
 
-
 /*
  ************************************************
  * Create custom loading indicator
@@ -69,15 +68,15 @@ function hideIndicator() {
  ************************************************
  */
 $.initialize = function(params) {
-    $.window.open();
-
     $.initializeViews();
     $.initializeHandlers();
+
+    $.window.open();
 
     Ti.API.info("start initSession");
     branch.setDebug();
     branch.initSession();
-    Ti.App.fireEvent("show_indicator");
+    // Ti.App.fireEvent("show_indicator");
 };
 
 $.initializeViews = function() {
@@ -85,8 +84,20 @@ $.initializeViews = function() {
 };
 
 $.initializeHandlers = function() {
-    // Android Activity Listeners
-    if (OS_ANDROID) {
+    if (OS_IOS) {
+        Ti.App.iOS.addEventListener('continueactivity', function(e) {
+            Ti.API.info("inside continueactivity: " + JSON.stringify(e));
+            if (e.activityType === 'io.branch.testbed.universalLink') {
+                branch.continueUserActivity(e.activityType, e.webpageURL, e.userInfo);
+            }
+        });
+
+        var activity = Ti.App.iOS.createUserActivity({
+            activityType:'io.branch.testbed.universalLink'
+        });
+
+        activity.becomeCurrent();
+    } else if (OS_ANDROID) {
         Ti.Android.currentActivity.addEventListener("open", function(e) {
             Ti.API.info("inside open");
         });
@@ -95,7 +106,7 @@ $.initializeHandlers = function() {
             Ti.API.info("inside newintent: " + e);
             $.window.open();
             branch.initSession();
-            Ti.App.fireEvent("show_indicator");
+            // Ti.App.fireEvent("show_indicator");
         });
     }
 
@@ -137,7 +148,7 @@ $.initializeHandlers = function() {
 $.onInitSessionFinished = function(data) {
     Ti.API.info("inside onInitSessionFinished");
     showData(data);
-    Ti.App.fireEvent("hide_indicator");
+    // Ti.App.fireEvent("hide_indicator");
 }
 
 $.onGetSessionButtonClicked = function() {
