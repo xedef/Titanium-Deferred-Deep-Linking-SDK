@@ -165,19 +165,7 @@ To implement, first add an entry to `NSUserActivityTypes` in your plist file.
 </plist>
 ```
 
-Then create a User Activity:
-
-```js
-if (OS_IOS) { // Don't forget this condition.
-    var activity = Ti.App.iOS.createUserActivity({
-        activityType:'io.branch.testbed.universalLink'
-    });
-
-    activity.becomeCurrent();
-}
-```
-
-Then add a listener to the event `continueactivity`:
+First, create a User Activity with the same name as you registered above and then add a listener to the event `continueactivity`:
 
 ```js
 if (OS_IOS) { // Don't forget this condition.
@@ -195,8 +183,7 @@ if (OS_IOS) { // Don't forget this condition.
 }
 ```
 
-**Note:** `initSession()` should be run first as the Universal Link data will be available on it's callback. See [initSession()](#initsession).
-
+**Note:** The Universal Link data will be available on it's callback - the above snippet is just to work around a Titanium deficiency. See [initSession()](#initsession).
 
 ___
 
