@@ -137,14 +137,65 @@ In iOS 9.2, Apple dropped support for URI scheme redirects. You must enable Univ
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-    <key>com.apple.developer.associated-domains</key>
-    <array>
-        <string>applinks:bnc.lt</string>
-    </array>
-</dict>
+  <dict>
+      <key>com.apple.developer.associated-domains</key>
+      <array>
+          <string>applinks:bnc.lt</string>
+      </array>
+  </dict>
 </plist>
 ```
+
+### iOS: Handle Universal Links on Cold Start
+
+Due to some certain limitations (at the time of writing), the module will not be able to handle data when clicking Universal Links while the app is not running at all.
+To solve this issue, you have to implement a listener to the 'continueactivity' on your Titanium app, retrieve the parameters and pass it to the module's `continueUserActivity` method.
+
+To implement, first add an entry to `NSUserActivityTypes` in your plist file.
+
+```xml
+<plist>
+  <dict>
+    ....
+    <key>NSUserActivityTypes</key>
+    <array>
+      <string>io.branch.testbed.universalLink</string> // This is only a sample. Use reverse domain.
+    </array>
+  </dict>
+</plist>
+```
+
+Then create a User Activity:
+
+```js
+if (OS_IOS) { // Don't forget this condition.
+    var activity = Ti.App.iOS.createUserActivity({
+        activityType:'io.branch.testbed.universalLink'
+    });
+
+    activity.becomeCurrent();
+}
+```
+
+Then add a listener to the event `continueactivity`:
+
+```js
+if (OS_IOS) { // Don't forget this condition.
+    var activity = Ti.App.iOS.createUserActivity({
+        activityType:'io.branch.testbed.universalLink'
+    });
+
+    activity.becomeCurrent();
+
+    Ti.App.iOS.addEventListener('continueactivity', function(e) {
+        if (e.activityType === 'io.branch.testbed.universalLink') {
+            branch.continueUserActivity(e.activityType, e.webpageURL, e.userInfo);
+        }
+    });
+}
+```
+
+**Note:** `initSession()` should be run first as the Universal Link data will be available on it's callback. See [initSession()](#initsession).
 
 
 ___
