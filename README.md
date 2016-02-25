@@ -149,7 +149,7 @@ In iOS 9.2, Apple dropped support for URI scheme redirects. You must enable Univ
 ### iOS: Handle Universal Links on Cold Start
 
 Due to some certain limitations (at the time of writing), the module will not be able to handle data when clicking Universal Links while the app is not running at all.
-To solve this issue, you have to implement a listener to the 'continueactivity' on your Titanium app, retrieve the parameters and pass it to the module's `continueUserActivity` method.
+To solve this issue, you have to implement a listener to the 'continueactivity' on your Titanium app, retrieve the parameters and pass it to the module's `continueUserActivity` method. You can see an example of how this is implemented in [our testbed code](https://github.com/BranchMetrics/Titanium-Deferred-Deep-Linking-SDK/blob/master/testbed/app/controllers/index.js#L86).
 
 To implement, first add an entry to `NSUserActivityTypes` in your plist file.
 
