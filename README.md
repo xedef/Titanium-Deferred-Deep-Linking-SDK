@@ -183,7 +183,7 @@ if (OS_IOS) { // Don't forget this condition.
 }
 ```
 
-**Note:** The Universal Link data will be available on it's callback - the above snippet is just to work around a Titanium deficiency. See [initSession()](#initsession).
+**Note:** The Universal Link data will be available in the initSession callback - the above snippet is just to work around a Titanium deficiency. See [initSession()](#initsession).
 
 ___
 
