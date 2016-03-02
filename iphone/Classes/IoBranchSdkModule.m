@@ -22,7 +22,9 @@ bool applicationOpenURLSourceApplication(id self, SEL _cmd, UIApplication* appli
 
     // if handleDeepLink returns YES, and you registered a callback in initSessionAndRegisterDeepLinkHandler, the callback will be called with the data associated with the deep link
     if (![[Branch getInstance] handleDeepLink:url]) {
-        // do other deep link routing for the Facebook SDK, Pinterest SDK, etc
+
+        // a little strange, looks recursive but we switch the implementations of this current method with the original implementation in the startup method
+        return applicationOpenURLSourceApplication(self, _cmd, application, url, sourceApplication, annotation);
     }
 
     return YES;
@@ -73,15 +75,23 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     if (modDelegate == nil) {
         modDelegate = objc_allocateClassPair(objectClass, [newClassName UTF8String], 0);
 
+        // original delegate's selectors
         SEL selectorToOverride1 = @selector(application:openURL:sourceApplication:annotation:);
         SEL selectorToOverride2 = @selector(application:continueUserActivity:restorationHandler:);
 
         Method m1 = class_getInstanceMethod(objectClass, selectorToOverride1);
         Method m2 = class_getInstanceMethod(objectClass, selectorToOverride2);
 
-        class_addMethod(modDelegate, selectorToOverride1, (IMP)applicationOpenURLSourceApplication, method_getTypeEncoding(m1));
-        class_addMethod(modDelegate, selectorToOverride2, (IMP)applicationContinueUserActivity, method_getTypeEncoding(m2));
+        // our method to switch implementation with the original delegate's
+        SEL selectorToUse1 = @selector(applicationOpenURLSourceApplication:);
+        Method u1 = class_getInstanceMethod(objectClass, selectorToUse1);
 
+        // switch implemention of openURL method
+        method_exchangeImplementations(m1, u1);
+        
+        // replace implementation of continueUserActivity method
+        class_addMethod(modDelegate, selectorToOverride2, (IMP)applicationContinueUserActivity, method_getTypeEncoding(m2));
+        
         objc_registerClassPair(modDelegate);
     }
     object_setClass(delegate, modDelegate);
