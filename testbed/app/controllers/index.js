@@ -171,7 +171,7 @@ $.onSetIdentityButtonClicked = function() {
     } else if (OS_IOS) {
         branch.setIdentity($.identityTextField.getValue(), function(params, success){
             if (success) {
-                alert("identity set: "+$.identityTextField.getValue());
+                alert("identity set: " + $.identityTextField.getValue());
             }
             else {
                 alert("Set Identity FAILED");
