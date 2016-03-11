@@ -88,10 +88,10 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
 
         // switch implemention of openURL method
         method_exchangeImplementations(m1, u1);
-        
+
         // replace implementation of continueUserActivity method
         class_addMethod(modDelegate, selectorToOverride2, (IMP)applicationContinueUserActivity, method_getTypeEncoding(m2));
-        
+
         objc_registerClassPair(modDelegate);
     }
     object_setClass(delegate, modDelegate);
@@ -301,16 +301,18 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     KrollCallback *callback = nil;
 
     // if a callback is passed as an argument
-    if ([args count]==2) {
+    if ([args isKindOfClass:[NSString class]]) {
+        ENSURE_SINGLE_ARG(args, NSString);
+        userId = (NSString *)args;
+    } else if ([args isKindOfClass:[NSArray class]]){
         ENSURE_TYPE([args objectAtIndex:0], NSString);
         userId = [args objectAtIndex:0];
 
         ENSURE_TYPE([args objectAtIndex:1], KrollCallback);
         callback = [args objectAtIndex:1];
-    }
-    else {
-        ENSURE_SINGLE_ARG(args, NSString);
-        userId = (NSString *)args;
+    } else {
+        NSLog(@"[INFO] setIdentity - invalid parameters");
+        return;
     }
 
     if (!callback) {

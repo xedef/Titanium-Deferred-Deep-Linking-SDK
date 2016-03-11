@@ -193,7 +193,7 @@ ___
   + [.initSession()](#initsession)
   + [.getLatestReferringParams()](#getlatestreferringparams)
   + [.getFirstReferringParams()](#getfirstreferringparams)
-  + [.setIdentity(identity)](#setidentityidentity)
+  + [.setIdentity(identity)](#setidentity)
   + [.logout()](#logout)
   + [.userCompletedAction()](#usercompletedaction)
 
