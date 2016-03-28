@@ -291,6 +291,9 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     return installParams;
 }
 
+- (id)getDeviceFingerprintId:(id)args {
+    return [[self getInstance] getDeviceFingerprintId];
+}
 
 #pragma mark - set identity
 

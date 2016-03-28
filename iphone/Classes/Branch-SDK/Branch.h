@@ -420,6 +420,7 @@ typedef NS_ENUM(NSUInteger, BranchPromoCodeUsageType) {
 - (void)accountForFacebookSDKPreventingAppLaunch;
 
 #pragma mark - Session Item methods
+- (NSString*) getDeviceFingerprintId;
 
 ///--------------------
 /// @name Session Items

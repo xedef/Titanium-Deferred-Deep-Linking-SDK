@@ -1185,6 +1185,10 @@ NSString * const BRANCH_PUSH_NOTIFICATION_PAYLOAD_KEY = @"branch";
     }
 }
 
+- (NSString*) getDeviceFingerprintId {
+    return self.preferenceHelper.deviceFingerprintID;
+}
+
 - (void)applicationWillResignActive {
     [self clearTimer];
     self.sessionTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(callClose) userInfo:nil repeats:NO];
