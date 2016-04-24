@@ -295,6 +295,20 @@ bool applicationContinueUserActivity(id self, SEL _cmd, UIApplication* applicati
     return [[self getInstance] getDeviceFingerprintId];
 }
 
+- (id)getSessionId:(id)args {
+    return [[self getInstance] getSessionId];
+}
+
+- (id)getIdentityId:(id)args {
+    return [[self getInstance] getIdentityId];
+}
+
+- (id)getHardwareId:(id)args {
+    BOOL isRealHardwareId;
+    return [[self getInstance] getHardwareId];
+}
+
+
 #pragma mark - set identity
 
 - (void)setIdentity:(id)args

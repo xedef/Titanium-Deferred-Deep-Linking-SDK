@@ -1189,6 +1189,26 @@ NSString * const BRANCH_PUSH_NOTIFICATION_PAYLOAD_KEY = @"branch";
     return self.preferenceHelper.deviceFingerprintID;
 }
 
+
+- (NSString*) getSessionId {
+    return self.preferenceHelper.sessionID;
+}
+
+
+- (NSString*) getIdentityId {
+    return self.preferenceHelper.identityID;
+}
+
+
+- (NSString*) getHardwareId {
+    BOOL dummy;
+    NSString *ret = [BNCSystemObserver getUniqueHardwareId:&dummy andIsDebug:self.preferenceHelper.isDebug];
+
+    return ret;
+}
+
+
+
 - (void)applicationWillResignActive {
     [self clearTimer];
     self.sessionTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(callClose) userInfo:nil repeats:NO];

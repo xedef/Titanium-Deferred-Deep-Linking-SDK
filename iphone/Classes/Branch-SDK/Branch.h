@@ -422,6 +422,12 @@ typedef NS_ENUM(NSUInteger, BranchPromoCodeUsageType) {
 #pragma mark - Session Item methods
 - (NSString*) getDeviceFingerprintId;
 
+- (NSString*) getSessionId;
+
+- (NSString*) getIdentityId;
+
+- (NSString*) getHardwareId;
+
 ///--------------------
 /// @name Session Items
 ///--------------------
